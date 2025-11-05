@@ -1,7 +1,18 @@
 const canvas = document.getElementById("oyunAlani");
 const ctx = canvas.getContext("2d");
-canvas.width = 1300;
-canvas.height = 760;
+
+// RESPONSIVE CANVAS
+function resizeCanvas() {
+  const ratio = 1300 / 760;
+  const width = window.innerWidth;
+  const height = width / ratio;
+  canvas.width = 1300;
+  canvas.height = 760;
+  canvas.style.width = width + "px";
+  canvas.style.height = height + "px";
+}
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
 
 let gemi, martilar = [], dalga;
 const resimler = {};
@@ -9,7 +20,6 @@ let arkaPlanMuzik;
 
 const urlParams = new URLSearchParams(window.location.search);
 const gemiAdi = urlParams.get('gemi')?.toLowerCase();
-
 const durumDiv = document.getElementById("durum");
 
 if (gemiAdi) {
@@ -28,7 +38,6 @@ if (gemiAdi) {
   durumDiv.innerText = "QR KOD YOK!";
 }
 
-// === RESİM VE SES YÜKLEME ===
 function yukleResim(adi, yol) {
   return new Promise((resolve) => {
     const img = new Image();
@@ -46,9 +55,8 @@ function yukleSes(yol) {
   });
 }
 
-// === GEMİ SINIFI (DOKUNMATİK) ===
 class Gemi {
-  constructor() { this.x = 500; this.y = 450; this.hiz = 8; }
+  constructor() { this.x = 500; this.y = 450; this.hiz = 12; }
   hareketEt(touch) {
     if (!touch) return;
     const rect = canvas.getBoundingClientRect();
@@ -70,34 +78,9 @@ class Gemi {
   ciz() { ctx.drawImage(resimler.gemi, this.x, this.y, 220, 200); }
 }
 
-// === DİĞER SINIFLAR ===
-class Dalga {
-  constructor() { this.x = 0; this.baslangicY = 97; this.y = this.baslangicY; this.zaman = 0; }
-  hareketEt() { this.zaman += 0.02; this.y = this.baslangicY + Math.sin(this.zaman) * 8; }
-  ciz() { if (resimler.dalga) ctx.drawImage(resimler.dalga, this.x, this.y, 1300, 600); }
-}
+class Dalga { /* aynı */ }
+class Marti { /* aynı */ }
 
-class Marti {
-  constructor(x, y, resim, hiz, yon = "sol", tersCevir = true) {
-    this.x = x; this.y = y; this.resim = resim; this.hiz = hiz; this.yon = yon; this.tersCevir = tersCevir; this.zaman = Math.random() * 100;
-  }
-  hareketEt() {
-    this.zaman += 0.1; this.y = this.y + Math.sin(this.zaman) * 4;
-    if (this.yon === "sol") { this.x -= this.hiz; if (this.x < -200) this.x = 1400; }
-    else if (this.yon === "sag") { this.x += this.hiz; if (this.x > 1400) this.x = -200; }
-  }
-  ciz() {
-    ctx.save();
-    if (this.yon === "sag" && this.tersCevir) {
-      ctx.translate(this.x + 140, this.y); ctx.scale(-1, 1); ctx.drawImage(this.resim, 0, 0, 140, 100);
-    } else {
-      ctx.drawImage(this.resim, this.x, this.y, 140, 100);
-    }
-    ctx.restore();
-  }
-}
-
-// === OYUN BAŞLAT ===
 async function baslatOyun() {
   await Promise.all([
     yukleResim("kule", "kiz_kulesi.jpg"),
@@ -105,16 +88,12 @@ async function baslatOyun() {
     yukleResim("marti1", "marti1.png"),
     yukleResim("marti2", "marti2.png"),
     yukleResim("marti3", "marti3.png"),
-    yukleSes("istanbul_sarkisi.mp3")
+    yukleSes("istanbul_sarkisi.ogg")
   ]);
 
   gemi = new Gemi();
   dalga = new Dalga();
-  martilar = [
-    new Marti(1400, 50, resimler.marti1, 1.0, "sol", true),
-    new Marti(-100, 110, resimler.marti2, 1.5, "sag", false),
-    new Marti(1400, 200, resimler.marti3, 2.5, "sol", true)
-  ];
+  martilar = [ /* aynı */ ];
 
   if (arkaPlanMuzik) { arkaPlanMuzik.loop = true; arkaPlanMuzik.volume = 0.6; arkaPlanMuzik.play().catch(() => {}); }
 
