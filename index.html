@@ -17,9 +17,9 @@
     #durum { margin-top: 20px; font-size: 24px; }
 
     #bilgi { position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
-             color: white; font-size: 36px; text-shadow: 2px 2px 4px black; }
+             color: white; font-size: 36px; text-shadow: 2px 2px 4px black; z-index: 10; }
     #talimat { position: absolute; top: 80px; left: 50%; transform: translateX(-50%);
-               color: white; font-size: 24px; text-shadow: 1px 1px 2px black; }
+               color: white; font-size: 24px; text-shadow: 1px 1px 2px black; z-index: 10; }
   </style>
 </head>
 <body>
@@ -27,10 +27,10 @@
 
   <div id="yuklemeEkran">
     <h1>İSTANBUL GEMİ MACERASI</h1>
-    <p id="durum">QR KOD YOK!</p>
+    <p id="durum">QR KOD BEKLENİYOR...</p>
   </div>
 
-  <div id="bilgi">İSTANBUL GEMİ MACERASI</div>
+  <div id="bilgi">İSTANBUL</div>
   <div id="talimat">Parmağınla gemiyi gezdir!</div>
 
   <script src="oyun.js"></script>
