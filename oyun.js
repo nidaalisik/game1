@@ -1,11 +1,10 @@
 const canvas = document.getElementById("oyunAlani");
 const ctx = canvas.getContext("2d");
 
-// RESPONSIVE UZUN DENİZ
 function resizeCanvas() {
   const width = window.innerWidth;
   const height = window.innerHeight;
-  canvas.width = width * 2;  // YÜKSEK ÇÖZÜNÜRLÜK
+  canvas.width = width * 2;
   canvas.height = height * 2;
   canvas.style.width = width + "px";
   canvas.style.height = height + "px";
@@ -13,7 +12,7 @@ function resizeCanvas() {
 window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
 
-let gemi, martilar = [], dalga;
+let gemi, martilar = [];
 const resimler = {};
 let arkaPlanMuzik;
 
@@ -48,24 +47,24 @@ function yukleResim(adi, yol) {
 
 async function baslatOyun() {
   await Promise.all([
-    yukleResim("kule", "kiz_kulesi_uzun.jpg"),  // UZUN RESİM!
+    yukleResim("kule", "kiz_kulesi_uzun.jpg"),
     yukleResim("marti1", "marti1.png"),
     yukleResim("marti2", "marti2.png"),
     yukleResim("marti3", "marti3.png")
   ]);
 
-  // MÜZİK (.mp3 ÇALIYOR!)
   arkaPlanMuzik = new Audio("istanbul_sarkisi.mp3");
   arkaPlanMuzik.loop = true;
   arkaPlanMuzik.volume = 0.6;
   arkaPlanMuzik.play().catch(() => {});
 
+  // GEMİ BÜYÜTÜLDÜ + YUKARI ÇIKIYOR!
   gemi = {
     x: canvas.width * 0.1,
-    y: canvas.height * 0.6,
-    width: canvas.width * 0.2,
-    height: canvas.width * 0.18,
-    hiz: 15
+    y: canvas.height * 0.3,  // DAHA YUKARI!
+    width: canvas.width * 0.3,   // %50 BÜYÜK!
+    height: canvas.width * 0.27,
+    hiz: 18
   };
 
   martilar = [
@@ -80,17 +79,14 @@ async function baslatOyun() {
   canvas.addEventListener("touchend", () => touch = null);
 
   function dongu() {
-    // UZUN DENİZ
     ctx.drawImage(resimler.kule, 0, 0, canvas.width, canvas.height);
 
-    // MARTILAR
     martilar.forEach(m => {
       if (m.yon === "sol") { m.x -= m.hiz; if (m.x < -300) m.x = canvas.width + 100; }
       else { m.x += m.hiz; if (m.x > canvas.width + 300) m.x = -200; }
       ctx.drawImage(m.resim, m.x, m.y, canvas.width * 0.12, canvas.width * 0.09);
     });
 
-    // GEMİ HAREKET
     if (touch) {
       const rect = canvas.getBoundingClientRect();
       const scaleX = canvas.width / rect.width;
@@ -103,11 +99,11 @@ async function baslatOyun() {
       if (targetY < gemi.y + gemi.height/2) gemi.y -= gemi.hiz;
       if (targetY > gemi.y + gemi.height/2) gemi.y += gemi.hiz;
 
+      // YUKARI SINIR KALDIRILDI → GEMİ İSTEDİĞİ YERE GİDİYOR!
       gemi.x = Math.max(0, Math.min(canvas.width - gemi.width, gemi.x));
-      gemi.y = Math.max(canvas.height * 0.5, Math.min(canvas.height * 0.75, gemi.y));
+      gemi.y = Math.max(0, Math.min(canvas.height - gemi.height, gemi.y)); // 0'dan başla!
     }
 
-    // GEMİ ÇİZ
     ctx.drawImage(resimler.gemi, gemi.x, gemi.y, gemi.width, gemi.height);
 
     requestAnimationFrame(dongu);
