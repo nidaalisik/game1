@@ -1,13 +1,12 @@
 const canvas = document.getElementById("oyunAlani");
 const ctx = canvas.getContext("2d");
 
-// RESPONSIVE CANVAS
+// RESPONSIVE UZUN DENİZ
 function resizeCanvas() {
-  const ratio = 1300 / 760;
   const width = window.innerWidth;
-  const height = width / ratio;
-  canvas.width = 1300;
-  canvas.height = 760;
+  const height = window.innerHeight;
+  canvas.width = width * 2;  // YÜKSEK ÇÖZÜNÜRLÜK
+  canvas.height = height * 2;
   canvas.style.width = width + "px";
   canvas.style.height = height + "px";
 }
@@ -47,55 +46,33 @@ function yukleResim(adi, yol) {
   });
 }
 
-function yukleSes(yol) {
-  return new Promise((resolve) => {
-    const audio = new Audio(yol);
-    audio.oncanplaythrough = () => { arkaPlanMuzik = audio; resolve(); };
-    audio.onerror = () => { console.error("MÜZİK YÜKLENEMEDİ!"); resolve(); };
-  });
-}
-
-class Gemi {
-  constructor() { this.x = 500; this.y = 450; this.hiz = 12; }
-  hareketEt(touch) {
-    if (!touch) return;
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    const clientX = touch.clientX - rect.left;
-    const clientY = touch.clientY - rect.top;
-    const targetX = clientX * scaleX;
-    const targetY = clientY * scaleY;
-
-    if (targetX < this.x) this.x -= this.hiz;
-    if (targetX > this.x) this.x += this.hiz;
-    if (targetY < this.y) this.y -= this.hiz;
-    if (targetY > this.y) this.y += this.hiz;
-
-    this.x = Math.max(0, Math.min(1080, this.x));
-    this.y = Math.max(400, Math.min(530, this.y));
-  }
-  ciz() { ctx.drawImage(resimler.gemi, this.x, this.y, 220, 200); }
-}
-
-class Dalga { /* aynı */ }
-class Marti { /* aynı */ }
-
 async function baslatOyun() {
   await Promise.all([
-    yukleResim("kule", "kiz_kulesi.jpg"),
-    yukleResim("dalga", "dalga.png"),
+    yukleResim("kule", "kiz_kulesi_uzun.jpg"),  // UZUN RESİM!
     yukleResim("marti1", "marti1.png"),
     yukleResim("marti2", "marti2.png"),
-    yukleResim("marti3", "marti3.png"),
-    yukleSes("istanbul_sarkisi.ogg")
+    yukleResim("marti3", "marti3.png")
   ]);
 
-  gemi = new Gemi();
-  dalga = new Dalga();
-  martilar = [ /* aynı */ ];
+  // MÜZİK (.mp3 ÇALIYOR!)
+  arkaPlanMuzik = new Audio("istanbul_sarkisi.mp3");
+  arkaPlanMuzik.loop = true;
+  arkaPlanMuzik.volume = 0.6;
+  arkaPlanMuzik.play().catch(() => {});
 
-  if (arkaPlanMuzik) { arkaPlanMuzik.loop = true; arkaPlanMuzik.volume = 0.6; arkaPlanMuzik.play().catch(() => {}); }
+  gemi = {
+    x: canvas.width * 0.1,
+    y: canvas.height * 0.6,
+    width: canvas.width * 0.2,
+    height: canvas.width * 0.18,
+    hiz: 15
+  };
+
+  martilar = [
+    { x: canvas.width, y: canvas.height * 0.1, resim: resimler.marti1, hiz: 1.5, yon: "sol" },
+    { x: -200, y: canvas.height * 0.2, resim: resimler.marti2, hiz: 2.0, yon: "sag" },
+    { x: canvas.width, y: canvas.height * 0.3, resim: resimler.marti3, hiz: 1.0, yon: "sol" }
+  ];
 
   let touch = null;
   canvas.addEventListener("touchstart", e => { e.preventDefault(); touch = e.touches[0]; });
@@ -103,11 +80,36 @@ async function baslatOyun() {
   canvas.addEventListener("touchend", () => touch = null);
 
   function dongu() {
-    ctx.drawImage(resimler.kule, 0, 0, 1300, 760);
-    dalga.hareketEt(); dalga.ciz();
-    martilar.forEach(m => { m.hareketEt(); m.ciz(); });
-    gemi.hareketEt(touch);
-    gemi.ciz();
+    // UZUN DENİZ
+    ctx.drawImage(resimler.kule, 0, 0, canvas.width, canvas.height);
+
+    // MARTILAR
+    martilar.forEach(m => {
+      if (m.yon === "sol") { m.x -= m.hiz; if (m.x < -300) m.x = canvas.width + 100; }
+      else { m.x += m.hiz; if (m.x > canvas.width + 300) m.x = -200; }
+      ctx.drawImage(m.resim, m.x, m.y, canvas.width * 0.12, canvas.width * 0.09);
+    });
+
+    // GEMİ HAREKET
+    if (touch) {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      const targetX = (touch.clientX - rect.left) * scaleX;
+      const targetY = (touch.clientY - rect.top) * scaleY;
+
+      if (targetX < gemi.x + gemi.width/2) gemi.x -= gemi.hiz;
+      if (targetX > gemi.x + gemi.width/2) gemi.x += gemi.hiz;
+      if (targetY < gemi.y + gemi.height/2) gemi.y -= gemi.hiz;
+      if (targetY > gemi.y + gemi.height/2) gemi.y += gemi.hiz;
+
+      gemi.x = Math.max(0, Math.min(canvas.width - gemi.width, gemi.x));
+      gemi.y = Math.max(canvas.height * 0.5, Math.min(canvas.height * 0.75, gemi.y));
+    }
+
+    // GEMİ ÇİZ
+    ctx.drawImage(resimler.gemi, gemi.x, gemi.y, gemi.width, gemi.height);
+
     requestAnimationFrame(dongu);
   }
   dongu();
