@@ -8,10 +8,12 @@ const resimler = {};
 let arkaPlanMuzik;
 
 const urlParams = new URLSearchParams(window.location.search);
-const gemiAdi = urlParams.get('gemi');
+const gemiAdi = urlParams.get('gemi')?.toLowerCase();
+
+const durumDiv = document.getElementById("durum");
 
 if (gemiAdi) {
-  document.getElementById("durum").innerText = `${gemiAdi.toUpperCase()}'İN GEMİSİ YÜKLENİYOR...`;
+  durumDiv.innerText = `${gemiAdi.toUpperCase()}'İN GEMİSİ YÜKLENİYOR...`;
   const img = new Image();
   img.onload = () => {
     resimler.gemi = img;
@@ -19,11 +21,11 @@ if (gemiAdi) {
     baslatOyun();
   };
   img.onerror = () => {
-    document.getElementById("durum").innerText = "GEMİ BULUNAMADI!";
+    durumDiv.innerText = "GEMİ BULUNAMADI!";
   };
   img.src = `gemiler/${gemiAdi}.png`;
 } else {
-  document.getElementById("durum").innerText = "QR KOD YOK!";
+  durumDiv.innerText = "QR KOD YOK!";
 }
 
 // === RESİM VE SES YÜKLEME ===
@@ -44,7 +46,7 @@ function yukleSes(yol) {
   });
 }
 
-// === SINIFLAR ===
+// === GEMİ SINIFI (DOKUNMATİK) ===
 class Gemi {
   constructor() { this.x = 500; this.y = 450; this.hiz = 8; }
   hareketEt(touch) {
@@ -68,6 +70,7 @@ class Gemi {
   ciz() { ctx.drawImage(resimler.gemi, this.x, this.y, 220, 200); }
 }
 
+// === DİĞER SINIFLAR ===
 class Dalga {
   constructor() { this.x = 0; this.baslangicY = 97; this.y = this.baslangicY; this.zaman = 0; }
   hareketEt() { this.zaman += 0.02; this.y = this.baslangicY + Math.sin(this.zaman) * 8; }
@@ -115,7 +118,7 @@ async function baslatOyun() {
 
   if (arkaPlanMuzik) { arkaPlanMuzik.loop = true; arkaPlanMuzik.volume = 0.6; arkaPlanMuzik.play().catch(() => {}); }
 
-  let touch;
+  let touch = null;
   canvas.addEventListener("touchstart", e => { e.preventDefault(); touch = e.touches[0]; });
   canvas.addEventListener("touchmove", e => { e.preventDefault(); touch = e.touches[0]; });
   canvas.addEventListener("touchend", () => touch = null);
@@ -130,11 +133,3 @@ async function baslatOyun() {
   }
   dongu();
 }
-
-// === PARMAKLA SÜRÜKLEME (TELEFON İÇİN) ===
-let dokunmatik = false;
-let sonX = 0, sonY = 0;
-
-canvas.addEventListener("touchstart", (e) => {
-  e.preventDefault();
-  dokunmatik = true
