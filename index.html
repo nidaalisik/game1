@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>İstanbul Gemi Macerası</title>
-  <link rel="stylesheet" href="style.css">
   <style>
-    body { margin: 0; background: #2980b9; overflow: hidden; font-family: Arial; }
+    body { margin: 0; background: #2980b9; font-family: Arial; overflow: hidden; }
     canvas { display: block; margin: 0 auto; }
+
     #yuklemeEkran {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(41,128,185,0.9); display: flex; flex-direction: column;
@@ -16,6 +15,7 @@
       font-size: 28px; z-index: 100;
     }
     #durum { margin-top: 20px; font-size: 24px; }
+
     #bilgi { position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
              color: white; font-size: 36px; text-shadow: 2px 2px 4px black; }
     #talimat { position: absolute; top: 80px; left: 50%; transform: translateX(-50%);
@@ -27,33 +27,12 @@
 
   <div id="yuklemeEkran">
     <h1>İSTANBUL GEMİ MACERASI</h1>
-    <p id="durum">QR kod okutuluyor...</p>
+    <p id="durum">QR KOD YOK!</p>
   </div>
 
   <div id="bilgi">İSTANBUL GEMİ MACERASI</div>
   <div id="talimat">Parmağınla gemiyi gezdir!</div>
 
   <script src="oyun.js"></script>
-  <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const gemiAdi = urlParams.get('gemi');
-
-    if (gemiAdi) {
-      document.getElementById("durum").innerText = gemiAdi.toUpperCase() + "'İN GEMİSİ YÜKLENİYOR...";
-      const img = new Image();
-      img.onload = () => {
-        resimler.gemi = img;
-        document.getElementById("yuklemeEkran").style.display = "none";
-        baslatOyun();
-      };
-      img.onerror = () => {
-        document.getElementById("durum").innerText = "GEMİ BULUNAMADI!";
-      };
-      img.src = "gemiler/" + gemiAdi + ".png";
-    } else {
-      document.getElementById("durum").innerText = "QR KOD YOK!";
-    }
-  </script>
 </body>
-
 </html>
