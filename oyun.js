@@ -66,13 +66,7 @@ async function baslatOyun() {
     height: canvas.width * 0.27,
     hiz: 18
   };
-  const yazi = {
-  metin: "KAPTAN!",
-  x: canvas.width / 2,
-  y: canvas.height * 0.18,  // YUKARI → TAŞMAZ!
-  fontSize: canvas.width * 0.08,
-  renk: "#FF0000"  // KIRMIZI!
-};
+ 
   // DALGA AYARLARI → İNCE + EKRANA OTURUYOR!
   dalga = {
     x: 0,
@@ -93,6 +87,17 @@ async function baslatOyun() {
   canvas.addEventListener("touchmove", e => { e.preventDefault(); touch = e.touches[0]; });
   canvas.addEventListener("touchend", () => touch = null);
 
+
+
+   const yazi = {
+  metin: "KAPTAN!",
+  x: canvas.width / 2,
+  y: canvas.height * 0.18,  // YUKARI → TAŞMAZ!
+  fontSize: canvas.width * 0.08,
+  renk: "#FF0000"  // KIRMIZI!
+};
+
+  
   function dongu() {
     // 1. ARKA PLAN
     ctx.drawImage(resimler.kule, 0, 0, canvas.width, canvas.height);
@@ -145,6 +150,7 @@ async function baslatOyun() {
   }
   dongu();
 }
+
 
 
 
