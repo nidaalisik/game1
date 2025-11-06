@@ -12,7 +12,7 @@ function resizeCanvas() {
 window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
 
-let gemi, martilar = [];
+let gemi, martilar = [], dalga;
 const resimler = {};
 let arkaPlanMuzik;
 
@@ -47,7 +47,8 @@ function yukleResim(adi, yol) {
 
 async function baslatOyun() {
   await Promise.all([
-    yukleResim("kule", "kiz_kulesi_uzun.jpg"),  // YAZISIZ UZUN RESİM!
+    yukleResim("kule", "kiz_kulesi_uzun.jpg"),
+    yukleResim("dalga", "dalga.png"),  // ŞEFFAF DALGA KATMANI
     yukleResim("marti1", "marti1.png"),
     yukleResim("marti2", "marti2.png"),
     yukleResim("marti3", "marti3.png")
@@ -66,7 +67,14 @@ async function baslatOyun() {
     hiz: 18
   };
 
-  // MARTILAR YUKARI-AŞAĞI UÇUYOR!
+  dalga = {
+    x: 0,
+    y: canvas.height * 0.4,
+    width: canvas.width,
+    height: canvas.height * 0.4,
+    zaman: 0
+  };
+
   martilar = [
     { x: canvas.width, baseY: canvas.height * 0.1, y: canvas.height * 0.1, resim: resimler.marti1, hiz: 1.5, yon: "sol", zaman: 0 },
     { x: -200, baseY: canvas.height * 0.2, y: canvas.height * 0.2, resim: resimler.marti2, hiz: 2.0, yon: "sag", zaman: 1.5 },
@@ -79,19 +87,24 @@ async function baslatOyun() {
   canvas.addEventListener("touchend", () => touch = null);
 
   function dongu() {
+    // 1. ARKA PLAN (KIZ KULESİ)
     ctx.drawImage(resimler.kule, 0, 0, canvas.width, canvas.height);
 
-    // MARTILAR: YUKARI-AŞAĞI + SOL-SAĞ
+    // 2. DALGA KATMANI (YUKARI-AŞAĞI)
+    dalga.zaman += 0.02;
+    dalga.y = canvas.height * 0.4 + Math.sin(dalga.zaman) * 30;
+    ctx.drawImage(resimler.dalga, dalga.x, dalga.y, dalga.width, dalga.height);
+
+    // 3. MARTILAR
     martilar.forEach(m => {
       m.zaman += 0.05;
-      m.y = m.baseY + Math.sin(m.zaman) * (canvas.height * 0.05); // YUKARI-AŞAĞI DALGALANMA
-
+      m.y = m.baseY + Math.sin(m.zaman) * (canvas.height * 0.05);
       if (m.yon === "sol") { m.x -= m.hiz; if (m.x < -300) m.x = canvas.width + 100; }
       else { m.x += m.hiz; if (m.x > canvas.width + 300) m.x = -200; }
-
       ctx.drawImage(m.resim, m.x, m.y, canvas.width * 0.12, canvas.width * 0.09);
     });
 
+    // 4. GEMİ HAREKET
     if (touch) {
       const rect = canvas.getBoundingClientRect();
       const scaleX = canvas.width / rect.width;
@@ -108,6 +121,7 @@ async function baslatOyun() {
       gemi.y = Math.max(0, Math.min(canvas.height - gemi.height, gemi.y));
     }
 
+    // 5. GEMİ
     ctx.drawImage(resimler.gemi, gemi.x, gemi.y, gemi.width, gemi.height);
 
     requestAnimationFrame(dongu);
