@@ -47,7 +47,7 @@ function yukleResim(adi, yol) {
 
 async function baslatOyun() {
   await Promise.all([
-    yukleResim("kule", "kiz_kulesi_uzun.jpg"),
+    yukleResim("kule", "kiz_kulesi_uzun.jpg"),  // YAZISIZ UZUN RESİM!
     yukleResim("marti1", "marti1.png"),
     yukleResim("marti2", "marti2.png"),
     yukleResim("marti3", "marti3.png")
@@ -58,19 +58,19 @@ async function baslatOyun() {
   arkaPlanMuzik.volume = 0.6;
   arkaPlanMuzik.play().catch(() => {});
 
-  // GEMİ BÜYÜTÜLDÜ + YUKARI ÇIKIYOR!
   gemi = {
     x: canvas.width * 0.1,
-    y: canvas.height * 0.3,  // DAHA YUKARI!
-    width: canvas.width * 0.3,   // %50 BÜYÜK!
+    y: canvas.height * 0.3,
+    width: canvas.width * 0.3,
     height: canvas.width * 0.27,
     hiz: 18
   };
 
+  // MARTILAR YUKARI-AŞAĞI UÇUYOR!
   martilar = [
-    { x: canvas.width, y: canvas.height * 0.1, resim: resimler.marti1, hiz: 1.5, yon: "sol" },
-    { x: -200, y: canvas.height * 0.2, resim: resimler.marti2, hiz: 2.0, yon: "sag" },
-    { x: canvas.width, y: canvas.height * 0.3, resim: resimler.marti3, hiz: 1.0, yon: "sol" }
+    { x: canvas.width, baseY: canvas.height * 0.1, y: canvas.height * 0.1, resim: resimler.marti1, hiz: 1.5, yon: "sol", zaman: 0 },
+    { x: -200, baseY: canvas.height * 0.2, y: canvas.height * 0.2, resim: resimler.marti2, hiz: 2.0, yon: "sag", zaman: 1.5 },
+    { x: canvas.width, baseY: canvas.height * 0.3, y: canvas.height * 0.3, resim: resimler.marti3, hiz: 1.0, yon: "sol", zaman: 3 }
   ];
 
   let touch = null;
@@ -81,9 +81,14 @@ async function baslatOyun() {
   function dongu() {
     ctx.drawImage(resimler.kule, 0, 0, canvas.width, canvas.height);
 
+    // MARTILAR: YUKARI-AŞAĞI + SOL-SAĞ
     martilar.forEach(m => {
+      m.zaman += 0.05;
+      m.y = m.baseY + Math.sin(m.zaman) * (canvas.height * 0.05); // YUKARI-AŞAĞI DALGALANMA
+
       if (m.yon === "sol") { m.x -= m.hiz; if (m.x < -300) m.x = canvas.width + 100; }
       else { m.x += m.hiz; if (m.x > canvas.width + 300) m.x = -200; }
+
       ctx.drawImage(m.resim, m.x, m.y, canvas.width * 0.12, canvas.width * 0.09);
     });
 
@@ -99,9 +104,8 @@ async function baslatOyun() {
       if (targetY < gemi.y + gemi.height/2) gemi.y -= gemi.hiz;
       if (targetY > gemi.y + gemi.height/2) gemi.y += gemi.hiz;
 
-      // YUKARI SINIR KALDIRILDI → GEMİ İSTEDİĞİ YERE GİDİYOR!
       gemi.x = Math.max(0, Math.min(canvas.width - gemi.width, gemi.x));
-      gemi.y = Math.max(0, Math.min(canvas.height - gemi.height, gemi.y)); // 0'dan başla!
+      gemi.y = Math.max(0, Math.min(canvas.height - gemi.height, gemi.y));
     }
 
     ctx.drawImage(resimler.gemi, gemi.x, gemi.y, gemi.width, gemi.height);
