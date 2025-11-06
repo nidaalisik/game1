@@ -84,10 +84,10 @@ async function baslatOyun() {
 
 
   const yazi = {
-  metin: "KAPTAN!",
+  metin: "Parmağınla Gwmini gezdir Kaptan!",
   x: canvas.width / 2,
   y: canvas.height * 0.18,  // YUKARI → TAŞMAZ!
-  fontSize: canvas.width * 0.08,
+  fontSize: canvas.width * 0.06,
   renk: "#FF0000"  // KIRMIZI!
 };
 
@@ -152,6 +152,7 @@ async function baslatOyun() {
   }
   dongu();
 }
+
 
 
 
