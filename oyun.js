@@ -104,29 +104,28 @@ async function baslatOyun() {
     ctx.drawImage(resimler.kule, 0, 0, canvas.width, canvas.height);
 
     // --- DALGA VE GÖLGE --- //
+// --- DALGA VE GÖLGE --- //
 dalga.zaman += 0.02;
 const dalgalanma = Math.sin(dalga.zaman * 2) * 10;
 
-// dalganın yukarıdan başlaması
-const denizBaslangicY = canvas.height * 0.30; 
-// perde gibi aşağı doğru uzasın
-const maxDalgaYukseklik = canvas.height * 0.70;
-const uzama = (Math.sin(dalga.zaman) * 0.5 + 0.5) * 0.3 + 0.7; // 0.7–1.0 arası uzama oranı
-const dalgaYukseklik = maxDalgaYukseklik * uzama;
+// Dalga yüksekliği ve başlangıcı
+const denizBaslangicY = canvas.height * 0.30; // deniz yüksekliği (kız kulesine yakın)
+const dalgaYukseklik = canvas.height * 0.64;
 
-const kaynakY = resimler.dalga.height * 0.18;
-const kaynakYukseklik = resimler.dalga.height * 0.82;
-
+// Dalga resmini sabit oranda çiz, perde efekti yok
 ctx.save();
 ctx.translate(0, denizBaslangicY + dalgalanma);
 ctx.drawImage(
   resimler.dalga,
-  0, kaynakY,
-  resimler.dalga.width, kaynakYukseklik,
   0, 0,
-  canvas.width, dalgaYukseklik // 👈 işte bu yukarı-aşağı uzuyor
+  resimler.dalga.width,
+  resimler.dalga.height,
+  0, 0,
+  canvas.width,
+  dalgaYukseklik
 );
 ctx.restore();
+
 
 
 
@@ -203,6 +202,7 @@ ctx.restore();
 
   dongu();
 }
+
 
 
 
