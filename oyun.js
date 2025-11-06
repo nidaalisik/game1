@@ -95,24 +95,22 @@ async function baslatOyun() {
     ctx.drawImage(resimler.kule, 0, 0, canvas.width, canvas.height);
 
     // 2. DALGA
-    // 2. DALGA (REPEAT ile)
+  // 2. DALGA (Repeat ile düzgün uzayan deniz)
 dalga.zaman += 0.01;
 const dalgalanma = Math.sin(dalga.zaman * 2) * 10;
 const dalgaY = canvas.height * dalga.yukariOran;
 
+// Pattern oluştur (her frame'de bir kez oluşturmak yerine burada kontrol et)
+if (!dalga.pattern && resimler.dalga.complete) {
+  dalga.pattern = ctx.createPattern(resimler.dalga, "repeat");
+}
+
 ctx.save();
 ctx.translate(0, dalgaY + dalgalanma);
-
-// Dalga pattern'i oluştur
-const pattern = ctx.createPattern(resimler.dalga, 'repeat');
-
-// Pattern'i çizim alanına uygula
-ctx.fillStyle = pattern;
-
-// Ekranın altına kadar denizi kapla
+ctx.fillStyle = dalga.pattern || "#2980b9";
 ctx.fillRect(0, 0, canvas.width, canvas.height - dalgaY);
-
 ctx.restore();
+
 
 
     // 3. MARTILAR
@@ -157,4 +155,5 @@ ctx.restore();
 
   dongu();
 }
+
 
