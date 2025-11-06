@@ -56,7 +56,11 @@ async function baslatOyun() {
   arkaPlanMuzik = new Audio("istanbul_sarkisi.mp3");
   arkaPlanMuzik.loop = true;
   arkaPlanMuzik.volume = 0.6;
+  function muzikBaslat() {
   arkaPlanMuzik.play().catch(() => {});
+  canvas.removeEventListener("touchstart", muzikBaslat);
+}
+canvas.addEventListener("touchstart", muzikBaslat);
 
   gemi = {
     x: canvas.width * 0.1,
@@ -91,7 +95,7 @@ async function baslatOyun() {
 
     // 2. DALGA - DİKEY RESMİ YATAYDA UZAT + ALTTAN GÖSTER
     dalga.zaman += 0.015;
-    const dalgalanma = Math.sin(dalga.zaman * 2) * 12;
+    const dalgalanma = Math.sin(dalga.zaman * 10) * 60;
 
     const oran = canvas.width / resimler.dalga.width;
     const kaynakY = resimler.dalga.height - (dalga.gorunenYukseklik / oran);
@@ -137,3 +141,4 @@ async function baslatOyun() {
   }
   dongu();
 }
+
