@@ -105,29 +105,31 @@ async function baslatOyun() {
 
     // --- DALGA VE GÖLGE --- //
 // --- DALGA VE GÖLGE --- //
-    dalga.zaman += 0.02;
-    const dalgalanma = Math.sin(dalga.zaman * 2) * 10;
+    // --- DALGA VE GÖLGE --- //
+dalga.zaman += 0.02;
 
-    // deniz başlangıcını yukarı taşıdık (kız kulesine yakın)
-    const denizBaslangicY = canvas.height * 0.30;
-    const dalgaYukseklik = canvas.height * 0.64;
+// Hafif yukarı-aşağı salınım
+const dalgalanma = Math.sin(dalga.zaman * 2) * 8;
 
-    // dalganın kaynak kısmından sadece köpüklü üst parçayı alıyoruz
-    const kaynakY = Math.max(0, (resimler.dalga ? resimler.dalga.height * 0.18 : 0));
-    const kaynakYukseklik = Math.max(1, (resimler.dalga ? resimler.dalga.height * 0.82 : canvas.height));
+// Dalga yüksekliği — “perde” gibi uzun ama sabit kalsın
+const denizBaslangicY = canvas.height * 0.30; // kız kulesine yakın
+const dalgaYukseklik = canvas.height * 0.75;  // deniz yüksekliği sabit, perde gibi uzun
 
-    if (resimler.dalga) {
-      ctx.save();
-      ctx.translate(0, denizBaslangicY + dalgalanma);
-      ctx.drawImage(
-        resimler.dalga,
-        0, kaynakY,
-        resimler.dalga.width, kaynakYukseklik,
-        0, 0,
-        canvas.width, dalgaYukseklik
-      );
-      ctx.restore();
-    }
+ctx.save();
+ctx.translate(0, denizBaslangicY + dalgalanma);
+
+// Dalga resmini sadece yüksekliğe sığacak şekilde uzat (ölçek bozulmadan)
+ctx.drawImage(
+  resimler.dalga,
+  0, 0,
+  resimler.dalga.width,
+  resimler.dalga.height,
+  0, 0,
+  canvas.width,
+  dalgaYukseklik
+);
+ctx.restore();
+
 
 
 
@@ -207,6 +209,7 @@ async function baslatOyun() {
 
   dongu();
 }
+
 
 
 
