@@ -15,7 +15,6 @@ resizeCanvas();
 let gemi, martilar = [], dalga;
 const resimler = {};
 let arkaPlanMuzik;
-
 const urlParams = new URLSearchParams(window.location.search);
 const gemiAdi = urlParams.get('gemi')?.toLowerCase();
 const durumDiv = document.getElementById("durum");
@@ -48,7 +47,7 @@ function yukleResim(adi, yol) {
 async function baslatOyun() {
   await Promise.all([
     yukleResim("kule", "kiz_kulesi_uzun.jpg"),
-    yukleResim("dalga", "dalga.png"),  // İNCE YATAY DALGA!
+    yukleResim("dalga", "dalga.png"),
     yukleResim("marti1", "marti1.png"),
     yukleResim("marti2", "marti2.png"),
     yukleResim("marti3", "marti3.png")
@@ -66,14 +65,11 @@ async function baslatOyun() {
     height: canvas.width * 0.27,
     hiz: 18
   };
- 
-  // DALGA AYARLARI → İNCE + EKRANA OTURUYOR!
+
+  // DALGA AYARLARI - DİKEY RESMİ YATAYDA UZATIYOR
   dalga = {
-    x: 0,
-    baseY: canvas.height * 0.22,  // DALGA DENİZ YÜZEYİNDE
-    width: canvas.width,
-    height: canvas.height * 0.48,  // İNCE YÜKSEKLİK
-    zaman: 0
+    zaman: 0,
+    gorunenYukseklik: canvas.height * 0.55  // ekranda görünen dalga yüksekliği
   };
 
   martilar = [
@@ -82,49 +78,51 @@ async function baslatOyun() {
     { x: canvas.width, baseY: canvas.height * 0.3, y: canvas.height * 0.3, resim: resimler.marti3, hiz: 1.0, yon: "sol", zaman: 3 }
   ];
 
-
-  
-
   let touch = null;
   canvas.addEventListener("touchstart", e => { e.preventDefault(); touch = e.touches[0]; });
   canvas.addEventListener("touchmove", e => { e.preventDefault(); touch = e.touches[0]; });
   canvas.addEventListener("touchend", () => touch = null);
 
-
-
-
-  
   function dongu() {
-    // 1. ARKA PLAN
+    // 1. Arka plan
     ctx.drawImage(resimler.kule, 0, 0, canvas.width, canvas.height);
 
-    // 2. DALGA KATMANI (İNCE + DOĞAL)
-    dalga.zaman += 0.02;
-    const dalgaOfset = Math.sin(dalga.zaman) * 20;  // HAFİF HAREKET
-    const dalgaY = dalga.baseY + dalgaOfset;
+    // 2. DALGA - SÜPER UZAYAN + DOĞAL HAREKET
+    dalga.zaman += 0.015;
+    const dalgalanma = Math.sin(dalga.zaman * 2) * 14;
 
-    ctx.drawImage(resimler.dalga, dalga.x, dalgaY, dalga.width, dalga.height);
+    // Orantılı yükseklik (431 → canvas.width kadar uzuyor)
+    const kaynakY = resimler.dalga.height - (dalga.gorunenYukseklik * (resimler.dalga.width / canvas.width));
 
+    ctx.drawImage(
+      resimler.dalga,
+      0, kaynakY + dalgalanma,
+      resimler.dalga.width, dalga.gorunenYukseklik,
+      0, canvas.height - dalga.gorunenYukseklik,
+      canvas.width, dalga.gorunenYukseklik
+    );
 
-    
-
-    
-    // 3. MARTILAR
+    // 3. Martılar
     martilar.forEach(m => {
       m.zaman += 0.05;
       m.y = m.baseY + Math.sin(m.zaman) * (canvas.height * 0.05);
-      if (m.yon === "sol") { m.x -= m.hiz; if (m.x < -300) m.x = canvas.width + 100; }
-      else { m.x += m.hiz; if (m.x > canvas.width + 300) m.x = -200; }
+      if (m.yon === "sol") {
+        m.x -= m.hiz;
+        if (m.x < -300) m.x = canvas.width + 100;
+      } else {
+        m.x += m.hiz;
+        if (m.x > canvas.width + 300) m.x = -200;
+      }
       ctx.drawImage(m.resim, m.x, m.y, canvas.width * 0.12, canvas.width * 0.09);
     });
 
-    // 4. GEMİ HAREKET
+    // 4. Gemi hareketi
     if (touch) {
       const rect = canvas.getBoundingClientRect();
       const scaleX = canvas.width / rect.width;
       const scaleY = canvas.height / rect.height;
       const targetX = (touch.clientX - rect.left) * scaleX;
-      const targetY = (touch.clientY - rect.top) * scaleY - dalgaOfset * 0.3;
+      const targetY = (touch.clientY - rect.top) * scaleY - dalgalanma * 0.4;
 
       if (targetX < gemi.x + gemi.width/2) gemi.x -= gemi.hiz;
       if (targetX > gemi.x + gemi.width/2) gemi.x += gemi.hiz;
@@ -135,26 +133,10 @@ async function baslatOyun() {
       gemi.y = Math.max(0, Math.min(canvas.height - gemi.height, gemi.y));
     }
 
-    // 5. GEMİ
+    // 5. Gemi çiz
     ctx.drawImage(resimler.gemi, gemi.x, gemi.y, gemi.width, gemi.height);
 
     requestAnimationFrame(dongu);
   }
   dongu();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
