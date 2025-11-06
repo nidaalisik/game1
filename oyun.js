@@ -98,6 +98,14 @@ async function baslatOyun() {
 
     ctx.drawImage(resimler.dalga, dalga.x, dalgaY, dalga.width, dalga.height);
 
+
+    // 3. YAZI → KIRMIZI + ORTADA!
+    ctx.font = `bold ${yazi.fontSize}px Arial`;
+    ctx.fillStyle = yazi.renk;
+    ctx.textAlign = "center";
+    ctx.fillText(yazi.metin, yazi.x, yazi.y);
+
+    
     // 3. MARTILAR
     martilar.forEach(m => {
       m.zaman += 0.05;
@@ -131,6 +139,7 @@ async function baslatOyun() {
   }
   dongu();
 }
+
 
 
 
