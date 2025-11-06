@@ -69,8 +69,8 @@ async function baslatOyun() {
   // DALGA: DİKEY RESMİ YATAYDA UZAT + ALTTAN GÖSTER
   dalga = {
     x: 0,
-    gorunenYukseklik: canvas.height * 0.25,
-    baslangicY: canvas.height * 0.20,// Ekranda görünen dalga yüksekliği
+    gorunenYukseklik: canvas.height * 0.55, // Ekranda görünen dalga yüksekliği
+    baslangicY: canvas.height * 0.45,
     zaman: 0
   };
 
@@ -91,7 +91,7 @@ async function baslatOyun() {
 
     // 2. DALGA - DİKEY RESMİ YATAYDA UZAT + ALTTAN GÖSTER
     dalga.zaman += 0.015;
-    const dalgalanma = Math.sin(dalga.zaman * 2) * 10;
+    const dalgalanma = Math.sin(dalga.zaman * 2) * 12;
 
     const oran = canvas.width / resimler.dalga.width;
     const kaynakY = resimler.dalga.height - (dalga.gorunenYukseklik / oran);
@@ -137,10 +137,3 @@ async function baslatOyun() {
   }
   dongu();
 }
-
-
-
-
-
-
-
