@@ -69,8 +69,8 @@ async function baslatOyun() {
   // DALGA AYARLARI - DİKEY RESMİ YATAYDA UZATIYOR
   dalga = {
     zaman: 0,
-    gorunenYukseklik: canvas.height * 0.25,
-    baslangicY: canvas.height * 0.35, // ekranda görünen dalga yüksekliği
+    gorunenYukseklik: canvas.height * 0.30,
+    baslangicY: canvas.height * 0.28, // ekranda görünen dalga yüksekliği
   };
 
   martilar = [
@@ -88,18 +88,15 @@ async function baslatOyun() {
     // 1. Arka plan
     ctx.drawImage(resimler.kule, 0, 0, canvas.width, canvas.height);
 
-    // DALGA - YUKARIDAN BAŞLA + KESİKSİZ
-dalga.zaman += 0.018;
-const dalgalanma = Math.sin(dalga.zaman * 2.2) * 8; // daha yumuşak
-
-const oran = canvas.width / resimler.dalga.width;
-const kaynakY = resimler.dalga.height - (dalga.gorunenYukseklik / oran);
+   // DALGA - KIZ KULESİNE YAKIN + DOĞAL
+dalga.zaman += 0.02;
+const dalgalanma = Math.sin(dalga.zaman * 2) * 10;
 
 ctx.drawImage(
   resimler.dalga,
-  0, kaynakY + dalgalanma,
-  resimler.dalga.width, dalga.gorunenYukseklik / oran,
-  0, dalga.baslangicY,                    // dalga ekranın %35'inden başlar
+  0, 0,                                      // şeffaf üstlü → baştan çiz
+  resimler.dalga.width, resimler.dalga.height,
+  0, dalga.baslangicY + dalgalanma,          // KIZ KULESİ ALTINDAN BAŞLA
   canvas.width, dalga.gorunenYukseklik
 );
 
@@ -141,6 +138,7 @@ ctx.drawImage(
   }
   dongu();
 }
+
 
 
 
