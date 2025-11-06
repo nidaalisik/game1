@@ -69,7 +69,8 @@ async function baslatOyun() {
   // DALGA AYARLARI - DİKEY RESMİ YATAYDA UZATIYOR
   dalga = {
     zaman: 0,
-    gorunenYukseklik: canvas.height * 0.55  // ekranda görünen dalga yüksekliği
+    gorunenYukseklik: canvas.height * 0.35,
+    baslangicY: canvas.height * 0.45, // ekranda görünen dalga yüksekliği
   };
 
   martilar = [
@@ -140,3 +141,4 @@ async function baslatOyun() {
   }
   dongu();
 }
+
