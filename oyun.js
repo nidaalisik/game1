@@ -82,6 +82,15 @@ async function baslatOyun() {
     { x: canvas.width, baseY: canvas.height * 0.3, y: canvas.height * 0.3, resim: resimler.marti3, hiz: 1.0, yon: "sol", zaman: 3 }
   ];
 
+
+  const yazi = {
+  metin: "KAPTAN!",
+  x: canvas.width / 2,
+  y: canvas.height * 0.18,  // YUKARI → TAŞMAZ!
+  fontSize: canvas.width * 0.08,
+  renk: "#FF0000"  // KIRMIZI!
+};
+
   let touch = null;
   canvas.addEventListener("touchstart", e => { e.preventDefault(); touch = e.touches[0]; });
   canvas.addEventListener("touchmove", e => { e.preventDefault(); touch = e.touches[0]; });
@@ -89,13 +98,6 @@ async function baslatOyun() {
 
 
 
-   const yazi = {
-  metin: "KAPTAN!",
-  x: canvas.width / 2,
-  y: canvas.height * 0.18,  // YUKARI → TAŞMAZ!
-  fontSize: canvas.width * 0.08,
-  renk: "#FF0000"  // KIRMIZI!
-};
 
   
   function dongu() {
@@ -150,6 +152,7 @@ async function baslatOyun() {
   }
   dongu();
 }
+
 
 
 
