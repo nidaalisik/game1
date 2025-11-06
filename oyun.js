@@ -75,6 +75,18 @@ async function baslatOyun() {
 
   dalga = { zaman: 0 };
 
+  // Köpük baloncuklarını oluştur
+  for (let i = 0; i < 40; i++) {
+    kopukler.push({
+      x: Math.random() * canvas.width,
+      y: canvas.height * 0.4 + Math.random() * (canvas.height * 0.3),
+      r: Math.random() * 12 + 3,
+      hizX: (Math.random() - 0.5) * 0.5,
+      hizY: (Math.random() - 0.5) * 0.3,
+      saydam: Math.random() * 0.5 + 0.2
+    });
+  }
+
   martilar = [
     { x: canvas.width, baseY: canvas.height * 0.1, y: canvas.height * 0.1, resim: resimler.marti1, hiz: 1.5, yon: "sol", zaman: 0 },
     { x: -200, baseY: canvas.height * 0.2, y: canvas.height * 0.2, resim: resimler.marti2, hiz: 2.0, yon: "sag", zaman: 1.5 },
@@ -109,6 +121,22 @@ async function baslatOyun() {
       canvas.width, dalgaYukseklik
     );
     ctx.restore();
+
+
+    // --- KÖPÜK BALONCUKLARI --- //
+    kopukler.forEach(k => {
+      k.x += k.hizX;
+      k.y += k.hizY + Math.sin(dalga.zaman + k.x * 0.01) * 0.3;
+      if (k.x < 0) k.x = canvas.width;
+      if (k.x > canvas.width) k.x = 0;
+      if (k.y < denizBaslangicY) k.y = denizBaslangicY + 20 + Math.random() * 100;
+      if (k.y > canvas.height) k.y = denizBaslangicY + Math.random() * 100;
+
+      ctx.beginPath();
+      ctx.arc(k.x, k.y, k.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,${k.saydam})`;
+      ctx.fill();
+    });
 
     // --- KÖPÜK (beyaz parlak üst kenar) --- //
     const köpükY = denizBaslangicY - 15 + dalgalanma;
@@ -168,5 +196,6 @@ async function baslatOyun() {
 
   dongu();
 }
+
 
 
