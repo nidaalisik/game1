@@ -83,13 +83,7 @@ async function baslatOyun() {
   ];
 
 
-  const yazi = {
-  metin: "Parmağınla Gwmini gezdir Kaptan!",
-  x: canvas.width / 2,
-  y: canvas.height * 0.18,  // YUKARI → TAŞMAZ!
-  fontSize: canvas.width * 0.06,
-  renk: "#FF0000"  // KIRMIZI!
-};
+  
 
   let touch = null;
   canvas.addEventListener("touchstart", e => { e.preventDefault(); touch = e.touches[0]; });
@@ -112,11 +106,7 @@ async function baslatOyun() {
     ctx.drawImage(resimler.dalga, dalga.x, dalgaY, dalga.width, dalga.height);
 
 
-    // 3. YAZI → KIRMIZI + ORTADA!
-    ctx.font = `bold ${yazi.fontSize}px Arial`;
-    ctx.fillStyle = yazi.renk;
-    ctx.textAlign = "center";
-    ctx.fillText(yazi.metin, yazi.x, yazi.y);
+    
 
     
     // 3. MARTILAR
@@ -152,6 +142,7 @@ async function baslatOyun() {
   }
   dongu();
 }
+
 
 
 
