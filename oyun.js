@@ -53,15 +53,19 @@ async function baslatOyun() {
     yukleResim("marti3", "marti3.png")
   ]);
 
+  // MÜZİK
   arkaPlanMuzik = new Audio("istanbul_sarkisi.mp3");
   arkaPlanMuzik.loop = true;
   arkaPlanMuzik.volume = 0.6;
-  function muzikBaslat() {
-  arkaPlanMuzik.play().catch(() => {});
-  canvas.removeEventListener("touchstart", muzikBaslat);
-}
-canvas.addEventListener("touchstart", muzikBaslat);
 
+  // Kullanıcı dokununca müzik başlasın
+  function muzikBaslat() {
+    arkaPlanMuzik.play().catch(() => {});
+    canvas.removeEventListener("touchstart", muzikBaslat);
+  }
+  canvas.addEventListener("touchstart", muzikBaslat);
+
+  // GEMİ
   gemi = {
     x: canvas.width * 0.1,
     y: canvas.height * 0.3,
@@ -70,14 +74,15 @@ canvas.addEventListener("touchstart", muzikBaslat);
     hiz: 18
   };
 
-  // DALGA: DİKEY RESMİ YATAYDA UZAT + ALTTAN GÖSTER
+  // DALGA
   dalga = {
     x: 0,
-    gorunenYukseklik: canvas.height * 0.55, // Ekranda görünen dalga yüksekliği
+    gorunenYukseklik: canvas.height * 0.55,
     baslangicY: canvas.height * 0.45,
     zaman: 0
   };
 
+  // MARTILAR
   martilar = [
     { x: canvas.width, baseY: canvas.height * 0.1, y: canvas.height * 0.1, resim: resimler.marti1, hiz: 1.5, yon: "sol", zaman: 0 },
     { x: -200, baseY: canvas.height * 0.2, y: canvas.height * 0.2, resim: resimler.marti2, hiz: 2.0, yon: "sag", zaman: 1.5 },
@@ -93,26 +98,20 @@ canvas.addEventListener("touchstart", muzikBaslat);
     // 1. ARKA PLAN
     ctx.drawImage(resimler.kule, 0, 0, canvas.width, canvas.height);
 
-    // 2. DALGA - YUMUŞAK DALGALANMA, ALTTAN GÖSTER
-dalga.zaman += 0.01; // biraz yavaş dalga
-const dalgalanma = Math.sin(dalga.zaman * 2) * 10;
+    // 2. DALGA - düzgün kesim + yumuşak hareket
+    dalga.zaman += 0.01;
+    const dalgalanma = Math.sin(dalga.zaman * 2) * 10;
 
-if (resimler.dalga.complete) {
-  const gorunenYukseklik = dalga.gorunenYukseklik;
-  const kaynakY = Math.max(0, resimler.dalga.height - (gorunenYukseklik / (canvas.height / resimler.dalga.height)));
-
-  ctx.save();
-  ctx.translate(0, canvas.height - gorunenYukseklik + dalgalanma);
-  ctx.drawImage(
-    resimler.dalga,
-    0, kaynakY,
-    resimler.dalga.width, gorunenYukseklik / (canvas.height / resimler.dalga.height),
-    0, 0,
-    canvas.width, gorunenYukseklik
-  );
-  ctx.restore();
-}
-
+    if (resimler.dalga.complete) {
+      ctx.save();
+      ctx.translate(0, canvas.height - dalga.gorunenYukseklik + dalgalanma);
+      ctx.drawImage(
+        resimler.dalga,
+        0, 0, resimler.dalga.width, resimler.dalga.height,
+        0, 0, canvas.width, dalga.gorunenYukseklik
+      );
+      ctx.restore();
+    }
 
     // 3. MARTILAR
     martilar.forEach(m => {
@@ -140,12 +139,10 @@ if (resimler.dalga.complete) {
       gemi.y = Math.max(0, Math.min(canvas.height - gemi.height, gemi.y));
     }
 
-    // 5. GEMİ
+    // 5. GEMİ ÇİZİMİ
     ctx.drawImage(resimler.gemi, gemi.x, gemi.y, gemi.width, gemi.height);
 
     requestAnimationFrame(dongu);
   }
   dongu();
 }
-
-
