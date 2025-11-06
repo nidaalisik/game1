@@ -66,7 +66,13 @@ async function baslatOyun() {
     height: canvas.width * 0.27,
     hiz: 18
   };
-
+  const yazi = {
+  metin: "KAPTAN!",
+  x: canvas.width / 2,
+  y: canvas.height * 0.18,  // YUKARI → TAŞMAZ!
+  fontSize: canvas.width * 0.08,
+  renk: "#FF0000"  // KIRMIZI!
+};
   // DALGA AYARLARI → İNCE + EKRANA OTURUYOR!
   dalga = {
     x: 0,
@@ -139,6 +145,7 @@ async function baslatOyun() {
   }
   dongu();
 }
+
 
 
 
