@@ -53,19 +53,16 @@ async function baslatOyun() {
     yukleResim("marti3", "marti3.png")
   ]);
 
-  // MÜZİK
   arkaPlanMuzik = new Audio("istanbul_sarkisi.mp3");
   arkaPlanMuzik.loop = true;
   arkaPlanMuzik.volume = 0.6;
 
-  // Kullanıcı dokununca müzik başlasın
   function muzikBaslat() {
     arkaPlanMuzik.play().catch(() => {});
     canvas.removeEventListener("touchstart", muzikBaslat);
   }
   canvas.addEventListener("touchstart", muzikBaslat);
 
-  // GEMİ
   gemi = {
     x: canvas.width * 0.1,
     y: canvas.height * 0.3,
@@ -74,15 +71,12 @@ async function baslatOyun() {
     hiz: 18
   };
 
-  // DALGA
   dalga = {
     x: 0,
     gorunenYukseklik: canvas.height * 0.55,
-    baslangicY: canvas.height * 0.45,
     zaman: 0
   };
 
-  // MARTILAR
   martilar = [
     { x: canvas.width, baseY: canvas.height * 0.1, y: canvas.height * 0.1, resim: resimler.marti1, hiz: 1.5, yon: "sol", zaman: 0 },
     { x: -200, baseY: canvas.height * 0.2, y: canvas.height * 0.2, resim: resimler.marti2, hiz: 2.0, yon: "sag", zaman: 1.5 },
@@ -94,11 +88,18 @@ async function baslatOyun() {
   canvas.addEventListener("touchmove", e => { e.preventDefault(); touch = e.touches[0]; });
   canvas.addEventListener("touchend", () => touch = null);
 
+  // Basit köpük parçacıkları
+  const kopukler = Array.from({ length: 25 }).map(() => ({
+    x: Math.random() * canvas.width,
+    y: canvas.height * (0.6 + Math.random() * 0.2),
+    r: Math.random() * 8 + 3,
+    hiz: Math.random() * 0.3 + 0.1,
+    parlaklik: Math.random()
+  }));
+
   function dongu() {
-    // 1. ARKA PLAN
     ctx.drawImage(resimler.kule, 0, 0, canvas.width, canvas.height);
 
-    // 2. DALGA - düzgün kesim + yumuşak hareket
     dalga.zaman += 0.01;
     const dalgalanma = Math.sin(dalga.zaman * 2) * 10;
 
@@ -113,7 +114,21 @@ async function baslatOyun() {
       ctx.restore();
     }
 
-    // 3. MARTILAR
+    // Köpük efekti (denizin üstü)
+    kopukler.forEach(k => {
+      k.x += Math.sin(k.y * 0.05 + dalga.zaman) * 0.5;
+      k.y -= k.hiz;
+      if (k.y < canvas.height * 0.45) {
+        k.y = canvas.height * (0.6 + Math.random() * 0.2);
+        k.x = Math.random() * canvas.width;
+      }
+      ctx.beginPath();
+      ctx.arc(k.x, k.y, k.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,${0.3 + Math.sin(k.parlaklik + dalga.zaman) * 0.2})`;
+      ctx.fill();
+    });
+
+    // Martılar
     martilar.forEach(m => {
       m.zaman += 0.05;
       m.y = m.baseY + Math.sin(m.zaman) * (canvas.height * 0.05);
@@ -122,7 +137,7 @@ async function baslatOyun() {
       ctx.drawImage(m.resim, m.x, m.y, canvas.width * 0.12, canvas.width * 0.09);
     });
 
-    // 4. GEMİ HAREKET
+    // Gemi hareketi
     if (touch) {
       const rect = canvas.getBoundingClientRect();
       const scaleX = canvas.width / rect.width;
@@ -139,7 +154,15 @@ async function baslatOyun() {
       gemi.y = Math.max(0, Math.min(canvas.height - gemi.height, gemi.y));
     }
 
-    // 5. GEMİ ÇİZİMİ
+    // Gemi yansıması (su üzerinde)
+    const yansimaY = gemi.y + gemi.height * 1.05;
+    ctx.save();
+    ctx.globalAlpha = 0.3;
+    ctx.scale(1, -1);
+    ctx.drawImage(resimler.gemi, gemi.x, -yansimaY - gemi.height, gemi.width, gemi.height);
+    ctx.restore();
+
+    // Gemi
     ctx.drawImage(resimler.gemi, gemi.x, gemi.y, gemi.width, gemi.height);
 
     requestAnimationFrame(dongu);
