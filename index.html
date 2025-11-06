@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -8,7 +7,7 @@
   <style>
     * { margin: 0; padding: 0; }
     html, body { width: 100%; height: 100%; overflow: hidden; background: #2980b9; }
-    canvas { display: block; width: 100%; height: 100%; object-fit: contain; }
+    canvas { display: block; width: 100%; height: 100%; object-fit: cover; }
 
     #yuklemeEkran {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -18,10 +17,20 @@
     }
     #durum { margin-top: 3vh; font-size: 4vw; }
 
-    #bilgi { position: absolute; top: 2vh; left: 50%; transform: translateX(-50%);
-             color: red; font-size: 6vw; text-shadow: 2px 2px 4px black; z-index: 10; }
-    #talimat { position: absolute; top: 10vh; left: 50%; transform: translateX(-50%);
-               color: red; font-size: 4vw; text-shadow: 1px 1px 2px black; z-index: 10; }
+    #bilgi {
+      position: absolute; top: 2vh; left: 50%;
+      transform: translateX(-50%);
+      color: red; font-size: 6vw;
+      text-shadow: 2px 2px 4px black;
+      z-index: 10;
+    }
+    #talimat {
+      position: absolute; top: 10vh; left: 50%;
+      transform: translateX(-50%);
+      color: red; font-size: 4vw;
+      text-shadow: 1px 1px 2px black;
+      z-index: 10;
+    }
   </style>
 </head>
 <body>
@@ -32,12 +41,64 @@
     <p id="durum">QR KOD BEKLENİYOR...</p>
   </div>
 
-  <div id="bilgi"> ♡ KIZ KULESİ ♡ </div>
+  <div id="bilgi">♡ KIZ KULESİ ♡</div>
   <div id="talimat">Parmağınla Gemini Gezdir!</div>
 
-  <script src="oyun.js"></script>
+  <script>
+    const canvas = document.getElementById("oyunAlani");
+    const ctx = canvas.getContext("2d");
+    let genislik, yukseklik;
+    let denizOffset = 0;
+    let dalgaHizi = 0.3;
+
+    const arkaPlan = new Image();
+    arkaPlan.src = "kiz_kulesi_uzun.jpg";
+
+    const dalga = new Image();
+    dalga.src = "dalga.png";
+
+    const muzik = new Audio("istanbul_sarkisi.mp3");
+    muzik.loop = true;
+
+    function boyutAyarla() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      genislik = canvas.width;
+      yukseklik = canvas.height;
+    }
+
+    window.addEventListener("resize", boyutAyarla);
+    boyutAyarla();
+
+    // Dalgayı kule hizasına getir (ekranın %45-50 civarı)
+    const DALGA_Y_HIZA = 0.48;
+
+    function ciz() {
+      ctx.clearRect(0, 0, genislik, yukseklik);
+      ctx.drawImage(arkaPlan, 0, 0, genislik, yukseklik);
+
+      // Dalga animasyonu
+      denizOffset += dalgaHizi;
+      if (denizOffset > dalga.width) denizOffset = 0;
+
+      let dalgaY = yukseklik * DALGA_Y_HIZA;
+      ctx.drawImage(dalga, -denizOffset, dalgaY, genislik + dalga.width, yukseklik - dalgaY);
+      ctx.drawImage(dalga, -denizOffset + dalga.width, dalgaY, genislik + dalga.width, yukseklik - dalgaY);
+
+      requestAnimationFrame(ciz);
+    }
+
+    arkaPlan.onload = ciz;
+
+    // Sesin çalışması için dokunma izni
+    function baslatSes() {
+      muzik.play().catch(() => {});
+      document.removeEventListener("touchstart", baslatSes);
+      document.removeEventListener("click", baslatSes);
+    }
+
+    document.addEventListener("touchstart", baslatSes, { once: true });
+    document.addEventListener("click", baslatSes, { once: true });
+  </script>
 </body>
 </html>
-
-
-
