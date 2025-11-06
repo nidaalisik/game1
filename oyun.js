@@ -57,7 +57,6 @@ async function baslatOyun() {
   arkaPlanMuzik.loop = true;
   arkaPlanMuzik.volume = 0.6;
 
-  // kullanıcı dokununca başlasın (mobil uyum)
   function muzikBaslat() {
     arkaPlanMuzik.play().catch(() => {});
     canvas.removeEventListener("touchstart", muzikBaslat);
@@ -68,7 +67,7 @@ async function baslatOyun() {
 
   gemi = {
     x: canvas.width * 0.1,
-    y: canvas.height * 0.45, // biraz daha aşağıya
+    y: canvas.height * 0.45,
     width: canvas.width * 0.3,
     height: canvas.width * 0.27,
     hiz: 18
@@ -77,7 +76,7 @@ async function baslatOyun() {
   dalga = {
     zaman: 0,
     gorunenYukseklik: canvas.height * 0.6,
-    yukariOran: 0.35 // dalga yüksekliği konumu (kız kulesine yakın)
+    yukariOran: 0.35
   };
 
   martilar = [
@@ -102,13 +101,14 @@ async function baslatOyun() {
 
     ctx.save();
     ctx.translate(0, dalgaY + dalgalanma);
-
-    const pattern = ctx.createPattern(resimler.dalga, 'repeat-y');
-    ctx.fillStyle = pattern;
-    ctx.fillRect(0, 0, canvas.width, canvas.height - dalgaY);
-
+    ctx.drawImage(
+      resimler.dalga,
+      0, 0,
+      resimler.dalga.width, resimler.dalga.height,
+      0, 0,
+      canvas.width, dalga.gorunenYukseklik
+    );
     ctx.restore();
-
 
     // 3. MARTILAR
     martilar.forEach(m => {
@@ -136,7 +136,15 @@ async function baslatOyun() {
       gemi.y = Math.max(0, Math.min(canvas.height - gemi.height, gemi.y));
     }
 
-    // 5. GEMİ
+    // 5. GEMİ GÖLGESİ
+    ctx.save();
+    ctx.globalAlpha = 0.3;
+    ctx.scale(1, 0.5);
+    const golgeY = (gemi.y + gemi.height * 1.6 + Math.sin(dalga.zaman * 2) * 8);
+    ctx.drawImage(resimler.gemi, gemi.x, golgeY, gemi.width, gemi.height);
+    ctx.restore();
+
+    // 6. GEMİ
     ctx.drawImage(resimler.gemi, gemi.x, gemi.y, gemi.width, gemi.height);
 
     requestAnimationFrame(dongu);
@@ -144,4 +152,3 @@ async function baslatOyun() {
 
   dongu();
 }
-
