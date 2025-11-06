@@ -76,7 +76,7 @@ async function baslatOyun() {
   dalga = {
     zaman: 0,
     gorunenYukseklik: canvas.height * 0.6,
-    yukariOran: 0.35
+    yukariOran: 0.45
   };
 
   martilar = [
@@ -95,35 +95,23 @@ async function baslatOyun() {
     ctx.drawImage(resimler.kule, 0, 0, canvas.width, canvas.height);
 
     // 2. DALGA
-  // 2. DALGA (Repeat ile düzgün uzayan deniz)
-// 2. DALGA (dikey dalga için özel repeat düzeltmesi)
-dalga.zaman += 0.01;
-const dalgalanma = Math.sin(dalga.zaman * 2) * 10;
-const dalgaY = canvas.height * dalga.yukariOran;
+ 
+// Dalga (tek görsel, yukarı-aşağı hareket)
+dalga.zaman += 0.02;
+const dalgalanma = Math.sin(dalga.zaman * 2) * 6; // yukarı-aşağı titreşim
+const dalgaY = canvas.height * dalga.yukariOran + dalgalanma; // kız kulesi altından başlatmak için oran
 
 ctx.save();
-ctx.translate(0, dalgaY + dalgalanma);
 
-// Dalga görselini yatayda döndür ve pattern olarak kullan
-if (!dalga.pattern && resimler.dalga.complete) {
-  // Canvas pattern için geçici resim oluştur
-  const tempCanvas = document.createElement("canvas");
-  const tctx = tempCanvas.getContext("2d");
-  tempCanvas.width = resimler.dalga.height;
-  tempCanvas.height = resimler.dalga.width;
+// dalga görseli tam ekran genişliğe sığsın
+const oran = canvas.width / resimler.dalga.width;
+const yeniYukseklik = resimler.dalga.height * oran;
 
-  // Görseli 90° döndürerek aktar
-  tctx.translate(tempCanvas.width / 2, tempCanvas.height / 2);
-  tctx.rotate(Math.PI / 2);
-  tctx.drawImage(resimler.dalga, -resimler.dalga.width / 2, -resimler.dalga.height / 2);
+// kız kulesi altı hizası için (örnek: yukariOran = 0.45 gibi bir değer deneyebilirsin)
+ctx.drawImage(resimler.dalga, 0, dalgaY, canvas.width, yeniYukseklik);
 
-  // Pattern oluştur
-  dalga.pattern = ctx.createPattern(tempCanvas, "repeat");
-}
-
-ctx.fillStyle = dalga.pattern || "#3498db";
-ctx.fillRect(0, 0, canvas.width, canvas.height - dalgaY);
 ctx.restore();
+
 
 
 
@@ -170,6 +158,7 @@ ctx.restore();
 
   dongu();
 }
+
 
 
 
