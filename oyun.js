@@ -60,7 +60,7 @@ async function baslatOyun() {
 
   gemi = {
     x: canvas.width * 0.1,
-    y: canvas.height * 0.20,
+    y: canvas.height * 0.18,
     width: canvas.width * 0.3,
     height: canvas.width * 0.27,
     hiz: 18
@@ -69,8 +69,8 @@ async function baslatOyun() {
   // DALGA AYARLARI - DİKEY RESMİ YATAYDA UZATIYOR
   dalga = {
     zaman: 0,
-    gorunenYukseklik: canvas.height * 0.30,
-    baslangicY: canvas.height * 0.28, // ekranda görünen dalga yüksekliği
+    gorunenYukseklik: canvas.height * 0.22,
+    baslangicY: canvas.height * 0.25, // ekranda görünen dalga yüksekliği
   };
 
   martilar = [
@@ -89,14 +89,15 @@ async function baslatOyun() {
     ctx.drawImage(resimler.kule, 0, 0, canvas.width, canvas.height);
 
    // DALGA - KIZ KULESİNE YAKIN + DOĞAL
+// DALGA - KIZ KULESİ ALTINA YAPIŞTIR
 dalga.zaman += 0.02;
-const dalgalanma = Math.sin(dalga.zaman * 2) * 10;
+const dalgalanma = Math.sin(dalga.zaman * 2) * 8;
 
 ctx.drawImage(
   resimler.dalga,
-  0, 0,                                      // şeffaf üstlü → baştan çiz
+  0, 0,
   resimler.dalga.width, resimler.dalga.height,
-  0, dalga.baslangicY + dalgalanma,          // KIZ KULESİ ALTINDAN BAŞLA
+  0, dalga.baslangicY + dalgalanma,
   canvas.width, dalga.gorunenYukseklik
 );
 
@@ -138,6 +139,7 @@ ctx.drawImage(
   }
   dongu();
 }
+
 
 
 
