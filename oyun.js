@@ -110,7 +110,7 @@ const dalgalanma = Math.sin(dalga.zaman * 2) * 10;
 
 // Dalga yüksekliği ve başlangıcı
 const denizBaslangicY = canvas.height * 0.30; // deniz yüksekliği (kız kulesine yakın)
-const dalgaYukseklik = canvas.height * 0.64;
+const dalgaYukseklik = canvas.height * 0.85;
 
 // Dalga resmini sabit oranda çiz, perde efekti yok
 ctx.save();
@@ -202,6 +202,7 @@ ctx.restore();
 
   dongu();
 }
+
 
 
 
