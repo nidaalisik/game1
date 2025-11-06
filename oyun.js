@@ -60,7 +60,7 @@ async function baslatOyun() {
 
   gemi = {
     x: canvas.width * 0.1,
-    y: canvas.height * 0.3,
+    y: canvas.height * 0.25,
     width: canvas.width * 0.3,
     height: canvas.width * 0.27,
     hiz: 18
@@ -88,20 +88,20 @@ async function baslatOyun() {
     // 1. Arka plan
     ctx.drawImage(resimler.kule, 0, 0, canvas.width, canvas.height);
 
-    // 2. DALGA - SÜPER UZAYAN + DOĞAL HAREKET
-    dalga.zaman += 0.015;
-    const dalgalanma = Math.sin(dalga.zaman * 2) * 14;
+    // DALGA - YUKARIDAN BAŞLA + DOĞAL DALGALANMA
+dalga.zaman += 0.015;
+const dalgalanma = Math.sin(dalga.zaman * 2) * 10; // biraz daha yumuşak
 
-    // Orantılı yükseklik (431 → canvas.width kadar uzuyor)
-    const kaynakY = resimler.dalga.height - (dalga.gorunenYukseklik * (resimler.dalga.width / canvas.width));
+const oran = canvas.width / resimler.dalga.width;
+const kaynakY = resimler.dalga.height - (dalga.gorunenYukseklik / oran);
 
-    ctx.drawImage(
-      resimler.dalga,
-      0, kaynakY + dalgalanma,
-      resimler.dalga.width, dalga.gorunenYukseklik,
-      0, canvas.height - dalga.gorunenYukseklik,
-      canvas.width, dalga.gorunenYukseklik
-    );
+ctx.drawImage(
+  resimler.dalga,
+  0, kaynakY + dalgalanma,
+  resimler.dalga.width, dalga.gorunenYukseklik / oran,
+  0, dalga.baslangicY,                    // YENİ: dalga daha yukarıda başlıyor
+  canvas.width, dalga.gorunenYukseklik
+);
 
     // 3. Martılar
     martilar.forEach(m => {
@@ -141,4 +141,5 @@ async function baslatOyun() {
   }
   dongu();
 }
+
 
