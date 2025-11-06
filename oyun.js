@@ -107,7 +107,7 @@ async function baslatOyun() {
     dalga.zaman += 0.02;
     const dalgalanma = Math.sin(dalga.zaman * 2) * 10;
 
-    const denizBaslangicY = canvas.height * 0.30; // deniz yüksekliği (kız kulesine yakın)
+    const denizBaslangicY = canvas.height * 0.25; // deniz yüksekliği (kız kulesine yakın)
     const dalgaYukseklik = canvas.height * 0.64;
     const kaynakY = resimler.dalga.height * 0.18;
     const kaynakYukseklik = resimler.dalga.height * 0.82;
@@ -197,6 +197,7 @@ async function baslatOyun() {
 
   dongu();
 }
+
 
 
 
