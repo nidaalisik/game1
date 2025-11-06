@@ -76,6 +76,7 @@ async function baslatOyun() {
   dalga = { zaman: 0 };
 
   // Köpük baloncuklarını oluştur
+  kopukler = [];
   for (let i = 0; i < 40; i++) {
     kopukler.push({
       x: Math.random() * canvas.width,
@@ -196,6 +197,7 @@ async function baslatOyun() {
 
   dongu();
 }
+
 
 
 
