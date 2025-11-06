@@ -72,7 +72,7 @@ async function baslatOyun() {
     x: 0,
     baseY: canvas.height * 0.25,  // DALGA DENİZ YÜZEYİNDE
     width: canvas.width,
-    height: canvas.height * 0.25,  // İNCE YÜKSEKLİK
+    height: canvas.height * 0.50,  // İNCE YÜKSEKLİK
     zaman: 0
   };
 
@@ -131,3 +131,4 @@ async function baslatOyun() {
   }
   dongu();
 }
+
