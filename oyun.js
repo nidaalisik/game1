@@ -12,7 +12,7 @@ function resizeCanvas() {
 window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
 
-let gemi, martilar = [], dalga;
+let gemi, martilar = [], dalga, kopukler = [];
 const resimler = {};
 let arkaPlanMuzik;
 const urlParams = new URLSearchParams(window.location.search);
@@ -196,6 +196,7 @@ async function baslatOyun() {
 
   dongu();
 }
+
 
 
 
