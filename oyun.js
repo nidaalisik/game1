@@ -57,24 +57,27 @@ async function baslatOyun() {
   arkaPlanMuzik.loop = true;
   arkaPlanMuzik.volume = 0.6;
 
+  // kullanıcı dokununca başlasın (mobil uyum)
   function muzikBaslat() {
     arkaPlanMuzik.play().catch(() => {});
     canvas.removeEventListener("touchstart", muzikBaslat);
+    canvas.removeEventListener("click", muzikBaslat);
   }
   canvas.addEventListener("touchstart", muzikBaslat);
+  canvas.addEventListener("click", muzikBaslat);
 
   gemi = {
     x: canvas.width * 0.1,
-    y: canvas.height * 0.3,
+    y: canvas.height * 0.45, // biraz daha aşağıya
     width: canvas.width * 0.3,
     height: canvas.width * 0.27,
     hiz: 18
   };
 
   dalga = {
-    x: 0,
-    gorunenYukseklik: canvas.height * 0.55,
-    zaman: 0
+    zaman: 0,
+    gorunenYukseklik: canvas.height * 0.6,
+    yukariOran: 0.35 // dalga yüksekliği konumu (kız kulesine yakın)
   };
 
   martilar = [
@@ -88,47 +91,27 @@ async function baslatOyun() {
   canvas.addEventListener("touchmove", e => { e.preventDefault(); touch = e.touches[0]; });
   canvas.addEventListener("touchend", () => touch = null);
 
-  // Basit köpük parçacıkları
-  const kopukler = Array.from({ length: 25 }).map(() => ({
-    x: Math.random() * canvas.width,
-    y: canvas.height * (0.6 + Math.random() * 0.2),
-    r: Math.random() * 8 + 3,
-    hiz: Math.random() * 0.3 + 0.1,
-    parlaklik: Math.random()
-  }));
-
   function dongu() {
+    // 1. ARKA PLAN
     ctx.drawImage(resimler.kule, 0, 0, canvas.width, canvas.height);
 
+    // 2. DALGA
     dalga.zaman += 0.01;
     const dalgalanma = Math.sin(dalga.zaman * 2) * 10;
+    const dalgaY = canvas.height * dalga.yukariOran;
 
-    if (resimler.dalga.complete) {
-      ctx.save();
-      ctx.translate(0, canvas.height - dalga.gorunenYukseklik + dalgalanma);
-      ctx.drawImage(
-        resimler.dalga,
-        0, 0, resimler.dalga.width, resimler.dalga.height,
-        0, 0, canvas.width, dalga.gorunenYukseklik
-      );
-      ctx.restore();
-    }
+    ctx.save();
+    ctx.translate(0, dalgaY + dalgalanma);
+    ctx.drawImage(
+      resimler.dalga,
+      0, 0,
+      resimler.dalga.width, resimler.dalga.height,
+      0, 0,
+      canvas.width, dalga.gorunenYukseklik
+    );
+    ctx.restore();
 
-    // Köpük efekti (denizin üstü)
-    kopukler.forEach(k => {
-      k.x += Math.sin(k.y * 0.05 + dalga.zaman) * 0.5;
-      k.y -= k.hiz;
-      if (k.y < canvas.height * 0.45) {
-        k.y = canvas.height * (0.6 + Math.random() * 0.2);
-        k.x = Math.random() * canvas.width;
-      }
-      ctx.beginPath();
-      ctx.arc(k.x, k.y, k.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(255,255,255,${0.3 + Math.sin(k.parlaklik + dalga.zaman) * 0.2})`;
-      ctx.fill();
-    });
-
-    // Martılar
+    // 3. MARTILAR
     martilar.forEach(m => {
       m.zaman += 0.05;
       m.y = m.baseY + Math.sin(m.zaman) * (canvas.height * 0.05);
@@ -137,7 +120,7 @@ async function baslatOyun() {
       ctx.drawImage(m.resim, m.x, m.y, canvas.width * 0.12, canvas.width * 0.09);
     });
 
-    // Gemi hareketi
+    // 4. GEMİ HAREKET
     if (touch) {
       const rect = canvas.getBoundingClientRect();
       const scaleX = canvas.width / rect.width;
@@ -145,27 +128,20 @@ async function baslatOyun() {
       const targetX = (touch.clientX - rect.left) * scaleX;
       const targetY = (touch.clientY - rect.top) * scaleY - dalgalanma * 0.3;
 
-      if (targetX < gemi.x + gemi.width/2) gemi.x -= gemi.hiz;
-      if (targetX > gemi.x + gemi.width/2) gemi.x += gemi.hiz;
-      if (targetY < gemi.y + gemi.height/2) gemi.y -= gemi.hiz;
-      if (targetY > gemi.y + gemi.height/2) gemi.y += gemi.hiz;
+      if (targetX < gemi.x + gemi.width / 2) gemi.x -= gemi.hiz;
+      if (targetX > gemi.x + gemi.width / 2) gemi.x += gemi.hiz;
+      if (targetY < gemi.y + gemi.height / 2) gemi.y -= gemi.hiz;
+      if (targetY > gemi.y + gemi.height / 2) gemi.y += gemi.hiz;
 
       gemi.x = Math.max(0, Math.min(canvas.width - gemi.width, gemi.x));
       gemi.y = Math.max(0, Math.min(canvas.height - gemi.height, gemi.y));
     }
 
-    // Gemi yansıması (su üzerinde)
-    const yansimaY = gemi.y + gemi.height * 1.05;
-    ctx.save();
-    ctx.globalAlpha = 0.3;
-    ctx.scale(1, -1);
-    ctx.drawImage(resimler.gemi, gemi.x, -yansimaY - gemi.height, gemi.width, gemi.height);
-    ctx.restore();
-
-    // Gemi
+    // 5. GEMİ
     ctx.drawImage(resimler.gemi, gemi.x, gemi.y, gemi.width, gemi.height);
 
     requestAnimationFrame(dongu);
   }
+
   dongu();
 }
