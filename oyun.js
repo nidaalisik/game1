@@ -70,7 +70,7 @@ async function baslatOyun() {
   dalga = {
     x: 0,
     gorunenYukseklik: canvas.height * 0.25,
-    baslangicY: canvas.height * 0.22,// Ekranda görünen dalga yüksekliği
+    baslangicY: canvas.height * 0.20,// Ekranda görünen dalga yüksekliği
     zaman: 0
   };
 
@@ -137,6 +137,7 @@ async function baslatOyun() {
   }
   dongu();
 }
+
 
 
 
