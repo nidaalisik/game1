@@ -69,7 +69,7 @@ async function baslatOyun() {
   // DALGA: DİKEY RESMİ YATAYDA UZAT + ALTTAN GÖSTER
   dalga = {
     x: 0,
-    gorunenYukseklik: canvas.height * 0.30,
+    gorunenYukseklik: canvas.height * 0.10,
     baslangicY: canvas.height * 0.25,// Ekranda görünen dalga yüksekliği
     zaman: 0
   };
@@ -137,6 +137,7 @@ async function baslatOyun() {
   }
   dongu();
 }
+
 
 
 
