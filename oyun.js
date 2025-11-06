@@ -75,8 +75,7 @@ async function baslatOyun() {
 
   dalga = {
     zaman: 0,
-    gorunenYukseklik: canvas.height * 0.6,
-    yukariOran: 0.45
+    yukariOran: 0.45 // denizin kız kulesi altından başlaması
   };
 
   martilar = [
@@ -94,27 +93,16 @@ async function baslatOyun() {
     // 1. ARKA PLAN
     ctx.drawImage(resimler.kule, 0, 0, canvas.width, canvas.height);
 
-    // 2. DALGA
- 
-// Dalga (tek görsel, yukarı-aşağı hareket)
-dalga.zaman += 0.02;
-const dalgalanma = Math.sin(dalga.zaman * 2) * 6; // yukarı-aşağı titreşim
-const dalgaY = canvas.height * dalga.yukariOran + dalgalanma; // kız kulesi altından başlatmak için oran
+    // 2. DALGA (tek görsel, köpüklü, inip çıkan)
+    dalga.zaman += 0.02;
+    const dalgalanma = Math.sin(dalga.zaman * 2) * 8;
+    const dalgaY = canvas.height * dalga.yukariOran + dalgalanma;
 
-ctx.save();
-
-// dalga görseli tam ekran genişliğe sığsın
-const oran = canvas.width / resimler.dalga.width;
-const yeniYukseklik = resimler.dalga.height * oran;
-
-// kız kulesi altı hizası için (örnek: yukariOran = 0.45 gibi bir değer deneyebilirsin)
-ctx.drawImage(resimler.dalga, 0, dalgaY, canvas.width, yeniYukseklik);
-
-ctx.restore();
-
-
-
-
+    ctx.save();
+    const oran = canvas.width / resimler.dalga.width;
+    const yeniYukseklik = resimler.dalga.height * oran;
+    ctx.drawImage(resimler.dalga, 0, dalgaY, canvas.width, yeniYukseklik);
+    ctx.restore();
 
     // 3. MARTILAR
     martilar.forEach(m => {
@@ -142,12 +130,13 @@ ctx.restore();
       gemi.y = Math.max(0, Math.min(canvas.height - gemi.height, gemi.y));
     }
 
-    // 5. GEMİ GÖLGESİ
+    // 5. GEMİ GÖLGESİ (yansıma, hafif dalgalı)
     ctx.save();
-    ctx.globalAlpha = 0.3;
-    ctx.scale(1, 0.5);
-    const golgeY = (gemi.y + gemi.height * 1.6 + Math.sin(dalga.zaman * 2) * 8);
-    ctx.drawImage(resimler.gemi, gemi.x, golgeY, gemi.width, gemi.height);
+    ctx.globalAlpha = 0.25;
+    const yansimaDalgalanma = Math.sin(dalga.zaman * 2 + gemi.x * 0.002) * 5;
+    ctx.translate(gemi.x + gemi.width / 2, gemi.y + gemi.height * 1.05 + yansimaDalgalanma);
+    ctx.scale(1, -1);
+    ctx.drawImage(resimler.gemi, -gemi.width / 2, 0, gemi.width, gemi.height);
     ctx.restore();
 
     // 6. GEMİ
@@ -158,7 +147,3 @@ ctx.restore();
 
   dongu();
 }
-
-
-
-
