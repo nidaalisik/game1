@@ -60,17 +60,17 @@ async function baslatOyun() {
 
   gemi = {
     x: canvas.width * 0.1,
-    y: canvas.height * 0.18,
+    y: canvas.height * 0.3,
     width: canvas.width * 0.3,
     height: canvas.width * 0.27,
     hiz: 18
   };
 
-  // DALGA AYARLARI - DİKEY RESMİ YATAYDA UZATIYOR
+  // DALGA: DİKEY RESMİ YATAYDA UZAT + ALTTAN GÖSTER
   dalga = {
-    zaman: 0,
-    gorunenYukseklik: canvas.height * 0.22,
-    baslangicY: canvas.height * 0.25, // ekranda görünen dalga yüksekliği
+    x: 0,
+    gorunenYukseklik: canvas.height * 0.50, // Ekranda görünen dalga yüksekliği
+    zaman: 0
   };
 
   martilar = [
@@ -85,43 +85,40 @@ async function baslatOyun() {
   canvas.addEventListener("touchend", () => touch = null);
 
   function dongu() {
-    // 1. Arka plan
+    // 1. ARKA PLAN
     ctx.drawImage(resimler.kule, 0, 0, canvas.width, canvas.height);
 
-   // DALGA - KIZ KULESİNE YAKIN + DOĞAL
-// DALGA - KIZ KULESİ ALTINA YAPIŞTIR
-dalga.zaman += 0.02;
-const dalgalanma = Math.sin(dalga.zaman * 2) * 8;
+    // 2. DALGA - DİKEY RESMİ YATAYDA UZAT + ALTTAN GÖSTER
+    dalga.zaman += 0.015;
+    const dalgalanma = Math.sin(dalga.zaman * 2) * 10;
 
-ctx.drawImage(
-  resimler.dalga,
-  0, 0,
-  resimler.dalga.width, resimler.dalga.height,
-  0, dalga.baslangicY + dalgalanma,
-  canvas.width, dalga.gorunenYukseklik
-);
+    const oran = canvas.width / resimler.dalga.width;
+    const kaynakY = resimler.dalga.height - (dalga.gorunenYukseklik / oran);
 
-    // 3. Martılar
+    ctx.drawImage(
+      resimler.dalga,
+      0, kaynakY + dalgalanma,
+      resimler.dalga.width, dalga.gorunenYukseklik / oran,
+      0, canvas.height - dalga.gorunenYukseklik,
+      canvas.width, dalga.gorunenYukseklik
+    );
+
+    // 3. MARTILAR
     martilar.forEach(m => {
       m.zaman += 0.05;
       m.y = m.baseY + Math.sin(m.zaman) * (canvas.height * 0.05);
-      if (m.yon === "sol") {
-        m.x -= m.hiz;
-        if (m.x < -300) m.x = canvas.width + 100;
-      } else {
-        m.x += m.hiz;
-        if (m.x > canvas.width + 300) m.x = -200;
-      }
+      if (m.yon === "sol") { m.x -= m.hiz; if (m.x < -300) m.x = canvas.width + 100; }
+      else { m.x += m.hiz; if (m.x > canvas.width + 300) m.x = -200; }
       ctx.drawImage(m.resim, m.x, m.y, canvas.width * 0.12, canvas.width * 0.09);
     });
 
-    // 4. Gemi hareketi
+    // 4. GEMİ HAREKET
     if (touch) {
       const rect = canvas.getBoundingClientRect();
       const scaleX = canvas.width / rect.width;
       const scaleY = canvas.height / rect.height;
       const targetX = (touch.clientX - rect.left) * scaleX;
-      const targetY = (touch.clientY - rect.top) * scaleY - dalgalanma * 0.4;
+      const targetY = (touch.clientY - rect.top) * scaleY - dalgalanma * 0.3;
 
       if (targetX < gemi.x + gemi.width/2) gemi.x -= gemi.hiz;
       if (targetX > gemi.x + gemi.width/2) gemi.x += gemi.hiz;
@@ -132,15 +129,10 @@ ctx.drawImage(
       gemi.y = Math.max(0, Math.min(canvas.height - gemi.height, gemi.y));
     }
 
-    // 5. Gemi çiz
+    // 5. GEMİ
     ctx.drawImage(resimler.gemi, gemi.x, gemi.y, gemi.width, gemi.height);
 
     requestAnimationFrame(dongu);
   }
   dongu();
 }
-
-
-
-
-
