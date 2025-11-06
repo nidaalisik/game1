@@ -60,7 +60,7 @@ async function baslatOyun() {
 
   gemi = {
     x: canvas.width * 0.1,
-    y: canvas.height * 0.25,
+    y: canvas.height * 0.20,
     width: canvas.width * 0.3,
     height: canvas.width * 0.27,
     hiz: 18
@@ -69,8 +69,8 @@ async function baslatOyun() {
   // DALGA AYARLARI - DİKEY RESMİ YATAYDA UZATIYOR
   dalga = {
     zaman: 0,
-    gorunenYukseklik: canvas.height * 0.35,
-    baslangicY: canvas.height * 0.45, // ekranda görünen dalga yüksekliği
+    gorunenYukseklik: canvas.height * 0.25,
+    baslangicY: canvas.height * 0.35, // ekranda görünen dalga yüksekliği
   };
 
   martilar = [
@@ -88,9 +88,9 @@ async function baslatOyun() {
     // 1. Arka plan
     ctx.drawImage(resimler.kule, 0, 0, canvas.width, canvas.height);
 
-    // DALGA - YUKARIDAN BAŞLA + DOĞAL DALGALANMA
-dalga.zaman += 0.015;
-const dalgalanma = Math.sin(dalga.zaman * 2) * 10; // biraz daha yumuşak
+    // DALGA - YUKARIDAN BAŞLA + KESİKSİZ
+dalga.zaman += 0.018;
+const dalgalanma = Math.sin(dalga.zaman * 2.2) * 8; // daha yumuşak
 
 const oran = canvas.width / resimler.dalga.width;
 const kaynakY = resimler.dalga.height - (dalga.gorunenYukseklik / oran);
@@ -99,7 +99,7 @@ ctx.drawImage(
   resimler.dalga,
   0, kaynakY + dalgalanma,
   resimler.dalga.width, dalga.gorunenYukseklik / oran,
-  0, dalga.baslangicY,                    // YENİ: dalga daha yukarıda başlıyor
+  0, dalga.baslangicY,                    // dalga ekranın %35'inden başlar
   canvas.width, dalga.gorunenYukseklik
 );
 
@@ -141,5 +141,6 @@ ctx.drawImage(
   }
   dongu();
 }
+
 
 
