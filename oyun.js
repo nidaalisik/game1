@@ -93,20 +93,26 @@ canvas.addEventListener("touchstart", muzikBaslat);
     // 1. ARKA PLAN
     ctx.drawImage(resimler.kule, 0, 0, canvas.width, canvas.height);
 
-    // 2. DALGA - DİKEY RESMİ YATAYDA UZAT + ALTTAN GÖSTER
-    dalga.zaman += 0.015;
-    const dalgalanma = Math.sin(dalga.zaman * 10) * 60;
+    // 2. DALGA - YUMUŞAK DALGALANMA, ALTTAN GÖSTER
+dalga.zaman += 0.01; // biraz yavaş dalga
+const dalgalanma = Math.sin(dalga.zaman * 2) * 10;
 
-    const oran = canvas.width / resimler.dalga.width;
-    const kaynakY = resimler.dalga.height - (dalga.gorunenYukseklik / oran);
+if (resimler.dalga.complete) {
+  const gorunenYukseklik = dalga.gorunenYukseklik;
+  const kaynakY = Math.max(0, resimler.dalga.height - (gorunenYukseklik / (canvas.height / resimler.dalga.height)));
 
-    ctx.drawImage(
-      resimler.dalga,
-      0, kaynakY + dalgalanma,
-      resimler.dalga.width, dalga.gorunenYukseklik / oran,
-      0, canvas.height - dalga.gorunenYukseklik,
-      canvas.width, dalga.gorunenYukseklik
-    );
+  ctx.save();
+  ctx.translate(0, canvas.height - gorunenYukseklik + dalgalanma);
+  ctx.drawImage(
+    resimler.dalga,
+    0, kaynakY,
+    resimler.dalga.width, gorunenYukseklik / (canvas.height / resimler.dalga.height),
+    0, 0,
+    canvas.width, gorunenYukseklik
+  );
+  ctx.restore();
+}
+
 
     // 3. MARTILAR
     martilar.forEach(m => {
@@ -141,4 +147,5 @@ canvas.addEventListener("touchstart", muzikBaslat);
   }
   dongu();
 }
+
 
