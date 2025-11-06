@@ -109,7 +109,7 @@ async function baslatOyun() {
 dalga.zaman += 0.02;
 
 // Hafif yukarı-aşağı salınım
-const dalgalanma = Math.sin(dalga.zaman * 2) * 8;
+const dalgalanma = Math.sin(dalga.zaman * 2) * 5;
 
 // Dalga yüksekliği — “perde” gibi uzun ama sabit kalsın
 const denizBaslangicY = canvas.height * 0.30; // kız kulesine yakın
@@ -209,6 +209,7 @@ ctx.restore();
 
   dongu();
 }
+
 
 
 
