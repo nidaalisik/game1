@@ -95,20 +95,25 @@ async function baslatOyun() {
     ctx.drawImage(resimler.kule, 0, 0, canvas.width, canvas.height);
 
     // 2. DALGA
-    dalga.zaman += 0.01;
-    const dalgalanma = Math.sin(dalga.zaman * 2) * 10;
-    const dalgaY = canvas.height * dalga.yukariOran;
+    // 2. DALGA (REPEAT ile)
+dalga.zaman += 0.01;
+const dalgalanma = Math.sin(dalga.zaman * 2) * 10;
+const dalgaY = canvas.height * dalga.yukariOran;
 
-    ctx.save();
-    ctx.translate(0, dalgaY + dalgalanma);
-    ctx.drawImage(
-      resimler.dalga,
-      0, 0,
-      resimler.dalga.width, resimler.dalga.height,
-      0, 0,
-      canvas.width, dalga.gorunenYukseklik
-    );
-    ctx.restore();
+ctx.save();
+ctx.translate(0, dalgaY + dalgalanma);
+
+// Dalga pattern'i oluştur
+const pattern = ctx.createPattern(resimler.dalga, 'repeat');
+
+// Pattern'i çizim alanına uygula
+ctx.fillStyle = pattern;
+
+// Ekranın altına kadar denizi kapla
+ctx.fillRect(0, 0, canvas.width, canvas.height - dalgaY);
+
+ctx.restore();
+
 
     // 3. MARTILAR
     martilar.forEach(m => {
@@ -152,3 +157,4 @@ async function baslatOyun() {
 
   dongu();
 }
+
