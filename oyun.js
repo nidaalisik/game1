@@ -70,9 +70,9 @@ async function baslatOyun() {
   // DALGA AYARLARI → İNCE + EKRANA OTURUYOR!
   dalga = {
     x: 0,
-    baseY: canvas.height * 0.18,  // DALGA DENİZ YÜZEYİNDE
+    baseY: canvas.height * 0.22,  // DALGA DENİZ YÜZEYİNDE
     width: canvas.width,
-    height: canvas.height * 0.80,  // İNCE YÜKSEKLİK
+    height: canvas.height * 0.48,  // İNCE YÜKSEKLİK
     zaman: 0
   };
 
@@ -131,6 +131,7 @@ async function baslatOyun() {
   }
   dongu();
 }
+
 
 
 
