@@ -102,14 +102,13 @@ async function baslatOyun() {
 
     ctx.save();
     ctx.translate(0, dalgaY + dalgalanma);
-    ctx.drawImage(
-      resimler.dalga,
-      0, 0,
-      resimler.dalga.width, resimler.dalga.height,
-      0, 0,
-      canvas.width, dalga.gorunenYukseklik
-    );
+
+    const pattern = ctx.createPattern(resimler.dalga, 'repeat-y');
+    ctx.fillStyle = pattern;
+    ctx.fillRect(0, 0, canvas.width, canvas.height - dalgaY);
+
     ctx.restore();
+
 
     // 3. MARTILAR
     martilar.forEach(m => {
@@ -145,3 +144,4 @@ async function baslatOyun() {
 
   dongu();
 }
+
