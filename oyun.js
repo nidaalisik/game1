@@ -96,20 +96,35 @@ async function baslatOyun() {
 
     // 2. DALGA
   // 2. DALGA (Repeat ile düzgün uzayan deniz)
+// 2. DALGA (dikey dalga için özel repeat düzeltmesi)
 dalga.zaman += 0.01;
 const dalgalanma = Math.sin(dalga.zaman * 2) * 10;
 const dalgaY = canvas.height * dalga.yukariOran;
 
-// Pattern oluştur (her frame'de bir kez oluşturmak yerine burada kontrol et)
-if (!dalga.pattern && resimler.dalga.complete) {
-  dalga.pattern = ctx.createPattern(resimler.dalga, "repeat");
-}
-
 ctx.save();
 ctx.translate(0, dalgaY + dalgalanma);
-ctx.fillStyle = dalga.pattern || "#2980b9";
+
+// Dalga görselini yatayda döndür ve pattern olarak kullan
+if (!dalga.pattern && resimler.dalga.complete) {
+  // Canvas pattern için geçici resim oluştur
+  const tempCanvas = document.createElement("canvas");
+  const tctx = tempCanvas.getContext("2d");
+  tempCanvas.width = resimler.dalga.height;
+  tempCanvas.height = resimler.dalga.width;
+
+  // Görseli 90° döndürerek aktar
+  tctx.translate(tempCanvas.width / 2, tempCanvas.height / 2);
+  tctx.rotate(Math.PI / 2);
+  tctx.drawImage(resimler.dalga, -resimler.dalga.width / 2, -resimler.dalga.height / 2);
+
+  // Pattern oluştur
+  dalga.pattern = ctx.createPattern(tempCanvas, "repeat");
+}
+
+ctx.fillStyle = dalga.pattern || "#3498db";
 ctx.fillRect(0, 0, canvas.width, canvas.height - dalgaY);
 ctx.restore();
+
 
 
 
@@ -155,5 +170,6 @@ ctx.restore();
 
   dongu();
 }
+
 
 
