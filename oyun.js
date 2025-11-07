@@ -112,7 +112,7 @@ dalga.zaman += 0.02;
 const dalgalanma = Math.sin(dalga.zaman * 2) * 5;
 
 // Dalga yüksekliği — “perde” gibi uzun ama sabit kalsın
-const denizBaslangicY = canvas.height * 0.09; // kız kulesine yakın
+const denizBaslangicY = canvas.height * 0.03; // kız kulesine yakın
 const dalgaYukseklik = canvas.height * 0.99;  // deniz yüksekliği sabit, perde gibi uzun
 
 ctx.save();
@@ -158,7 +158,7 @@ ctx.restore();
 
     // --- KÖPÜK (beyaz parlak üst kenar) --- //
     const köpükY = denizBaslangicY + 10 + dalgalanma;
-    const köpükYukseklik = 35;
+    const köpükYukseklik = 30;
     const gradient = ctx.createLinearGradient(0, köpükY, 0, köpükY + köpükYukseklik);
     gradient.addColorStop(0, 'rgba(255,255,255,0.6)');
     gradient.addColorStop(1, 'rgba(255,255,255,0)');
@@ -192,7 +192,7 @@ ctx.restore();
     }
 
     // --- GEMİ GÖLGESİ --- //
-    const gölgeY = gemi.y + gemi.yükseklik + 10; // hemen altı
+    const gölgeY = gemi.y + gemi.yükseklik + 6; // hemen altı
     ctx.save();
     ctx.scale(1, -1); // ters
     ctx.globalAlpha = 0.25;
@@ -214,6 +214,7 @@ ctx.restore();
 
   dongu();
 }
+
 
 
 
