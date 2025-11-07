@@ -192,7 +192,7 @@ ctx.restore();
     }
 
     // --- GEMİ GÖLGESİ --- //
-    const gölgeY = gemi.y + gemi.yükseklik + 6; // hemen altı
+    const gölgeY = gemi.y + gemi.yükseklik + 2; // hemen altı
     ctx.save();
     ctx.scale(1, -1); // ters
     ctx.globalAlpha = 0.25;
@@ -214,6 +214,7 @@ ctx.restore();
 
   dongu();
 }
+
 
 
 
