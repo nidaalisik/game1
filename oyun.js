@@ -192,19 +192,24 @@ ctx.restore();
     }
 
     // --- GEMİ GÖLGESİ --- //
-    const gölgeY = gemi.y + gemi.yükseklik + 2; // hemen altı
-    ctx.save();
-    ctx.scale(1, -1); // ters
-    ctx.globalAlpha = 0.25;
-    ctx.drawImage(
-      resimler.gemi,
-      gemi.x,
-      -(gölgeY + gemi.yükseklik),
-      gemi.genislik,
-      gemi.yükseklik
-    );
-    ctx.restore();
-    ctx.globalAlpha = 1;
+const gölgeDip = gemi.y + gemi.yükseklik + (dalgalanma * 0.3); 
+// gemi sallanırken gölge de onunla birlikte sallansın
+
+ctx.save();
+ctx.scale(1, -1); 
+ctx.globalAlpha = 0.25;
+
+ctx.drawImage(
+  resimler.gemi,
+  gemi.x,
+  -(gölgeDip + gemi.yükseklik),
+  gemi.genislik,
+  gemi.yükseklik
+);
+
+ctx.restore();
+ctx.globalAlpha = 1;
+
 
     // --- GEMİ --- //
     ctx.drawImage(resimler.gemi, gemi.x, gemi.y, gemi.genislik, gemi.yükseklik);
@@ -214,6 +219,7 @@ ctx.restore();
 
   dongu();
 }
+
 
 
 
