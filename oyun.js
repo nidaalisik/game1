@@ -189,23 +189,27 @@ async function baslatOyun() {
       gemi.y = Math.max(0, Math.min(canvas.height - gemi.yükseklik, gemi.y));
     }
 
-    // ✅ GEMİ GÖLGESİ — düzeltilmiş
-    const gölgeDip = gemi.y + gemi.yükseklik + (dalgalanma * 0.3);
+    // GEMİ GÖLGESİ (suya yakın)
+const gölgeX = gemi.x + gemi.genislik * 0.1;
+const gölgeY = gemi.y + gemi.yükseklik - 10; // biraz yukarıdan başlat
+const gölgeGenislik = gemi.genislik * 0.8;
+const gölgeYukseklik = 20;
 
-    ctx.save();
-    ctx.scale(1, -1);
-    ctx.globalAlpha = 0.25;
-
-    ctx.drawImage(
-      resimler.gemi,
-      gemi.x,
-      -(gölgeDip + gemi.yükseklik),
-      gemi.genislik,
-      gemi.yükseklik
-    );
-
-    ctx.restore();
-    ctx.globalAlpha = 1;
+ctx.save();
+ctx.globalAlpha = 0.25;
+ctx.fillStyle = "black";
+ctx.beginPath();
+ctx.ellipse(
+  gölgeX + gölgeGenislik / 2,
+  gölgeY + gölgeYukseklik / 2 + (dalgalanma * 0.3),
+  gölgeGenislik / 2,
+  gölgeYukseklik / 2,
+  0,
+  0,
+  Math.PI * 2
+);
+ctx.fill();
+ctx.restore();
 
     // GEMİ
     ctx.drawImage(resimler.gemi, gemi.x, gemi.y, gemi.genislik, gemi.yükseklik);
@@ -215,5 +219,6 @@ async function baslatOyun() {
 
   dongu();
 }
+
 
 
