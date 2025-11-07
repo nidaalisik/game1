@@ -112,7 +112,7 @@ dalga.zaman += 0.02;
 const dalgalanma = Math.sin(dalga.zaman * 2) * 5;
 
 // Dalga yüksekliği — “perde” gibi uzun ama sabit kalsın
-const denizBaslangicY = canvas.height * 0.07; // kız kulesine yakın
+const denizBaslangicY = canvas.height * 0.09; // kız kulesine yakın
 const dalgaYukseklik = canvas.height * 0.99;  // deniz yüksekliği sabit, perde gibi uzun
 
 ctx.save();
@@ -219,6 +219,7 @@ ctx.globalAlpha = 1;
 
   dongu();
 }
+
 
 
 
