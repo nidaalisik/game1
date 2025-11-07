@@ -157,7 +157,7 @@ ctx.restore();
     });
 
     // --- KÖPÜK (beyaz parlak üst kenar) --- //
-    const köpükY = denizBaslangicY + dalgalanma + 5;
+    const köpükY = denizBaslangicY + dalgalanma;
     const köpükYukseklik = 30;
     const gradient = ctx.createLinearGradient(0, köpükY, 0, köpükY + köpükYukseklik);
     gradient.addColorStop(0, 'rgba(255,255,255,0.6)');
@@ -214,6 +214,7 @@ ctx.restore();
 
   dongu();
 }
+
 
 
 
