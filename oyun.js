@@ -108,7 +108,7 @@ async function baslatOyun() {
     dalga.zaman += 0.02;
     const dalgalanma = Math.sin(dalga.zaman * 2) * 5;
 
-    const denizBaslangicY = canvas.height * 0.05;
+    const denizBaslangicY = canvas.height * 0.04;
     const dalgaYukseklik = canvas.height * 0.99;
 
     ctx.save();
@@ -215,4 +215,5 @@ async function baslatOyun() {
 
   dongu();
 }
+
 
