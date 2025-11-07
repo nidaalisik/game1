@@ -119,15 +119,20 @@ ctx.save();
 ctx.translate(0, denizBaslangicY + dalgalanma);
 
 // Dalga resmini sadece yüksekliğe sığacak şekilde uzat (ölçek bozulmadan)
+// Dalga kırpma ayarları (üstten biraz kırp, bozulmayı engelle)
+const kaynakY = resimler.dalga.height * 0.05;          // resmin üst %5’i kırpılır
+const kaynakYukseklik = resimler.dalga.height * 0.95;  // geri kalan %95’i kullanılır
+
 ctx.drawImage(
   resimler.dalga,
-  0, 0,
+  0, kaynakY,
   resimler.dalga.width,
-  resimler.dalga.height,
+  kaynakYukseklik,
   0, 0,
   canvas.width,
   dalgaYukseklik
 );
+
 ctx.restore();
 
 
@@ -209,6 +214,7 @@ ctx.restore();
 
   dongu();
 }
+
 
 
 
