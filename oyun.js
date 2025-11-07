@@ -75,7 +75,7 @@ async function baslatOyun() {
 
   dalga = { zaman: 0 };
 
-  // Köpük baloncuklarını oluştur
+  // Köpük baloncukları
   kopukler = [];
   for (let i = 0; i < 40; i++) {
     kopukler.push({
@@ -100,51 +100,40 @@ async function baslatOyun() {
   canvas.addEventListener("touchend", () => touch = null);
 
   function dongu() {
-    // --- ARKA PLAN --- //
+
+    // ARKA PLAN
     ctx.drawImage(resimler.kule, 0, 0, canvas.width, canvas.height);
 
-    // --- DALGA VE GÖLGE --- //
-// --- DALGA VE GÖLGE --- //
-    // --- DALGA VE GÖLGE --- //
-dalga.zaman += 0.02;
+    // DALGA
+    dalga.zaman += 0.02;
+    const dalgalanma = Math.sin(dalga.zaman * 2) * 5;
 
-// Hafif yukarı-aşağı salınım
-const dalgalanma = Math.sin(dalga.zaman * 2) * 5;
+    const denizBaslangicY = canvas.height * 0.07;
+    const dalgaYukseklik = canvas.height * 0.99;
 
-// Dalga yüksekliği — “perde” gibi uzun ama sabit kalsın
-const denizBaslangicY = canvas.height * 0.07; // kız kulesine yakın
-const dalgaYukseklik = canvas.height * 0.99;  // deniz yüksekliği sabit, perde gibi uzun
+    ctx.save();
+    ctx.translate(0, denizBaslangicY + dalgalanma);
 
-ctx.save();
-ctx.translate(0, denizBaslangicY + dalgalanma);
+    const kaynakY = resimler.dalga.height * 0.05;
+    const kaynakYukseklik = resimler.dalga.height * 0.95;
 
-// Dalga resmini sadece yüksekliğe sığacak şekilde uzat (ölçek bozulmadan)
-// Dalga kırpma ayarları (üstten biraz kırp, bozulmayı engelle)
-const kaynakY = resimler.dalga.height * 0.05;          // resmin üst %5’i kırpılır
-const kaynakYukseklik = resimler.dalga.height * 0.95;  // geri kalan %95’i kullanılır
+    ctx.drawImage(
+      resimler.dalga,
+      0, kaynakY,
+      resimler.dalga.width,
+      kaynakYukseklik,
+      0, 0,
+      canvas.width,
+      dalgaYukseklik
+    );
 
-ctx.drawImage(
-  resimler.dalga,
-  0, kaynakY,
-  resimler.dalga.width,
-  kaynakYukseklik,
-  0, 0,
-  canvas.width,
-  dalgaYukseklik
-);
+    ctx.restore();
 
-ctx.restore();
-
-
-
-
-
-
-
-    // --- KÖPÜK BALONCUKLARI --- //
+    // Köpük baloncukları
     kopukler.forEach(k => {
       k.x += k.hizX;
       k.y += k.hizY + Math.sin(dalga.zaman + k.x * 0.01) * 0.3;
+
       if (k.x < 0) k.x = canvas.width;
       if (k.x > canvas.width) k.x = 0;
       if (k.y < denizBaslangicY) k.y = denizBaslangicY + 20 + Math.random() * 100;
@@ -156,25 +145,34 @@ ctx.restore();
       ctx.fill();
     });
 
-    // --- KÖPÜK (beyaz parlak üst kenar) --- //
-    const köpükY = dalgaY;
+    // ✅ KÖPÜK ÜST ÇİZGİ — düzeltildi
+    const köpükY = denizBaslangicY + dalgalanma;
     const köpükYukseklik = 30;
+
     const gradient = ctx.createLinearGradient(0, köpükY, 0, köpükY + köpükYukseklik);
-    gradient.addColorStop(0, 'rgba(255,255,255,0.6)');
-    gradient.addColorStop(1, 'rgba(255,255,255,0)');
+    gradient.addColorStop(0, "rgba(255,255,255,0.6)");
+    gradient.addColorStop(1, "rgba(255,255,255,0)");
+
     ctx.fillStyle = gradient;
     ctx.fillRect(0, köpükY, canvas.width, köpükYukseklik);
 
-    // --- MARTILAR --- //
+    // MARTILAR
     martilar.forEach(m => {
       m.zaman += 0.05;
       m.y = m.baseY + Math.sin(m.zaman) * (canvas.height * 0.05);
-      if (m.yon === "sol") { m.x -= m.hiz; if (m.x < -300) m.x = canvas.width + 100; }
-      else { m.x += m.hiz; if (m.x > canvas.width + 300) m.x = -200; }
+
+      if (m.yon === "sol") {
+        m.x -= m.hiz;
+        if (m.x < -300) m.x = canvas.width + 100;
+      } else {
+        m.x += m.hiz;
+        if (m.x > canvas.width + 300) m.x = -200;
+      }
+
       ctx.drawImage(m.resim, m.x, m.y, canvas.width * 0.12, canvas.width * 0.09);
     });
 
-    // --- GEMİ HAREKET --- //
+    // GEMİ HAREKETİ
     if (touch) {
       const rect = canvas.getBoundingClientRect();
       const scaleX = canvas.width / rect.width;
@@ -191,27 +189,25 @@ ctx.restore();
       gemi.y = Math.max(0, Math.min(canvas.height - gemi.yükseklik, gemi.y));
     }
 
-    // --- GEMİ GÖLGESİ --- //
-const gölgeDip = gemi.y + gemi.yükseklik + (dalgalanma * 0.3); 
-// gemi sallanırken gölge de onunla birlikte sallansın
+    // ✅ GEMİ GÖLGESİ — düzeltilmiş
+    const gölgeDip = gemi.y + gemi.yükseklik + (dalgalanma * 0.3);
 
-ctx.save();
-ctx.scale(1, -1); 
-ctx.globalAlpha = 0.25;
+    ctx.save();
+    ctx.scale(1, -1);
+    ctx.globalAlpha = 0.25;
 
-ctx.drawImage(
-  resimler.gemi,
-  gemi.x,
-  -(gölgeDip + gemi.yükseklik),
-  gemi.genislik,
-  gemi.yükseklik
-);
+    ctx.drawImage(
+      resimler.gemi,
+      gemi.x,
+      -(gölgeDip + gemi.yükseklik),
+      gemi.genislik,
+      gemi.yükseklik
+    );
 
-ctx.restore();
-ctx.globalAlpha = 1;
+    ctx.restore();
+    ctx.globalAlpha = 1;
 
-
-    // --- GEMİ --- //
+    // GEMİ
     ctx.drawImage(resimler.gemi, gemi.x, gemi.y, gemi.genislik, gemi.yükseklik);
 
     requestAnimationFrame(dongu);
@@ -219,39 +215,3 @@ ctx.globalAlpha = 1;
 
   dongu();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
