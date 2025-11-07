@@ -120,7 +120,7 @@ ctx.translate(0, denizBaslangicY + dalgalanma);
 
 // Dalga resmini sadece yüksekliğe sığacak şekilde uzat (ölçek bozulmadan)
 // Dalga kırpma ayarları (üstten biraz kırp, bozulmayı engelle)
-const kaynakY = resimler.dalga.height * 0.05;          // resmin üst %5’i kırpılır
+const kaynakY = resimler.dalga.height * 0.10;          // resmin üst %5’i kırpılır
 const kaynakYukseklik = resimler.dalga.height * 0.95;  // geri kalan %95’i kullanılır
 
 ctx.drawImage(
@@ -157,7 +157,7 @@ ctx.restore();
     });
 
     // --- KÖPÜK (beyaz parlak üst kenar) --- //
-    const köpükY = denizBaslangicY + dalgalanma;
+    const köpükY = denizBaslangicY + 20 + dalgalanma;
     const köpükYukseklik = 30;
     const gradient = ctx.createLinearGradient(0, köpükY, 0, köpükY + köpükYukseklik);
     gradient.addColorStop(0, 'rgba(255,255,255,0.6)');
@@ -214,6 +214,7 @@ ctx.restore();
 
   dongu();
 }
+
 
 
 
