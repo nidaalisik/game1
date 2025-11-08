@@ -26,21 +26,31 @@
 
     
     
-      #aikaLogo {
-    position: absolute;
-    top: 2vw;
-    left: 2vw;
-    width: 18vw;
-    max-width: 120px;
-    opacity: 0;
-    animation: fadeInLogo 2s ease-in forwards;
-    z-index: 15;
-  }
+     #aikaLogo {
+  position: absolute;
+  top: 2vw;
+  left: 2vw;
+  width: 20vw;
+  max-width: 140px;
+  opacity: 0;
+  z-index: 15;
+  animation:
+    fadeInLogo 2s ease-in forwards,
+    waveMotion 4s ease-in-out infinite;
+}
 
-    @keyframes fadeInLogo {
+@keyframes fadeInLogo {
   from { opacity: 0; transform: scale(0.95); }
   to { opacity: 1; transform: scale(1); }
 }
+
+@keyframes waveMotion {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-3px) rotate(-1deg); }
+  50% { transform: translateY(2px) rotate(1deg); }
+  75% { transform: translateY(-2px) rotate(0.5deg); }
+}
+
   #imza {
     position: absolute;
     bottom: 2vw;
@@ -99,6 +109,7 @@
   <script src="oyun.js"></script>
 </body>
 </html>
+
 
 
 
