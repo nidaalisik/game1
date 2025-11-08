@@ -12,6 +12,10 @@ function resizeCanvas() {
 window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
 
+document.getElementById("aikaLogo").style.display = "none";
+document.getElementById("imza").style.display = "none";
+
+
 let gemi, martilar = [], dalga, kopukler = [];
 const resimler = {};
 let arkaPlanMuzik;
@@ -224,6 +228,7 @@ ctx.restore();
 
   dongu();
 }
+
 
 
 
