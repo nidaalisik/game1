@@ -45,6 +45,11 @@ function yukleResim(adi, yol) {
 }
 
 async function baslatOyun() {
+
+  document.getElementById("aikaLogo").style.display = "block";
+  document.getElementById("imza").style.display = "block";
+
+  
   await Promise.all([
     yukleResim("kule", "kiz_kulesi_uzun.jpg"),
     yukleResim("dalga", "dalga.png"),
@@ -219,6 +224,7 @@ ctx.restore();
 
   dongu();
 }
+
 
 
 
