@@ -194,8 +194,12 @@ async function baslatOyun() {
       if (targetY < gemi.y + gemi.yükseklik / 2) gemi.y -= gemi.hiz;
       if (targetY > gemi.y + gemi.yükseklik / 2) gemi.y += gemi.hiz;
 
-      gemi.x = Math.max(0, Math.min(canvas.width - gemi.genislik, gemi.x));
-      gemi.y = Math.max(0, Math.min(canvas.height - gemi.yükseklik, gemi.y));
+      // Geminin üst sınırı (Kız Kulesi'nin hemen altı)
+const ustSinir = canvas.height * 0.32; // oran tam hizaya göre ayarlanmış
+
+gemi.x = Math.max(0, Math.min(canvas.width - gemi.genislik, gemi.x));
+gemi.y = Math.max(ustSinir, Math.min(canvas.height - gemi.yükseklik, gemi.y));
+
     }
 
     // GEMİ GÖLGESİ (suya yakın)
@@ -228,6 +232,7 @@ ctx.restore();
 
   dongu();
 }
+
 
 
 
