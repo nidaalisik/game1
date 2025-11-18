@@ -114,7 +114,7 @@ async function baslatOyun() {
     ctx.drawImage(resimler.kule, 0, 0, canvas.width, canvas.height);
 
     // DALGA
-    dalga.zaman += 0.02;    
+    dalga.zaman += 0.025;    
     const dalgalanma = Math.sin(dalga.zaman * 2) * 6;
 
                          
@@ -241,6 +241,7 @@ ctx.restore();
 
   dongu();
 }
+
 
 
 
