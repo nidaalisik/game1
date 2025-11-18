@@ -114,8 +114,8 @@ async function baslatOyun() {
     ctx.drawImage(resimler.kule, 0, 0, canvas.width, canvas.height);
 
     // DALGA
-    dalga.zaman += 0.02;    
-    const dalgalanma = Math.sin(dalga.zaman * 2) * 8;
+    dalga.zaman += 0.025;    
+    const dalgalanma = Math.sin(dalga.zaman * 2) * 7;
 
                          
 
@@ -127,11 +127,10 @@ async function baslatOyun() {
 
 
 
-    const maxDalga = canvas.height * 0.05; // dalganın yukarı taşabileceği maksimum
-    const dalgaOffset = Math.min(dalgalanma, maxDalga); // üst sınır
+    
 
     ctx.save();
-    ctx.translate(0, denizBaslangicY + dalgaOffset);
+    ctx.translate(0, denizBaslangicY + dalgalanma);
 
     const kaynakY = resimler.dalga.height * 0.05;
     const kaynakYukseklik = resimler.dalga.height * 0.95;
@@ -242,6 +241,7 @@ ctx.restore();
 
   dongu();
 }
+
 
 
 
