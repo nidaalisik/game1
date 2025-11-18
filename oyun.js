@@ -122,8 +122,16 @@ async function baslatOyun() {
     const denizBaslangicY = canvas.height * 0.04;
     const dalgaYukseklik = canvas.height * 0.99;
 
+
+
+
+
+
+    const maxDalga = canvas.height * 0.05; // dalganın yukarı taşabileceği maksimum
+    const dalgaOffset = Math.min(dalgalanma, maxDalga); // üst sınır
+
     ctx.save();
-    ctx.translate(0, denizBaslangicY + dalgalanma);
+    ctx.translate(0, denizBaslangicY + dalgaOffset);
 
     const kaynakY = resimler.dalga.height * 0.05;
     const kaynakYukseklik = resimler.dalga.height * 0.95;
@@ -234,6 +242,7 @@ ctx.restore();
 
   dongu();
 }
+
 
 
 
