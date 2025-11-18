@@ -190,7 +190,7 @@ async function baslatOyun() {
       const scaleX = canvas.width / rect.width;
       const scaleY = canvas.height / rect.height;
       const targetX = (touch.clientX - rect.left) * scaleX;
-      const targetY = (touch.clientY - rect.top) * scaleY - dalgalanma * 0.5;  //0.3tü
+      const targetY = (touch.clientY - rect.top) * scaleY - dalgalanma * 0.25;  //0.3tü
 
       if (targetX < gemi.x + gemi.genislik / 2) gemi.x -= gemi.hiz;
       if (targetX > gemi.x + gemi.genislik / 2) gemi.x += gemi.hiz;
@@ -235,6 +235,7 @@ ctx.restore();
 
   dongu();
 }
+
 
 
 
