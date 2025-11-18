@@ -115,7 +115,7 @@ async function baslatOyun() {
 
     // DALGA
     dalga.zaman += 0.02;    
-    const dalgalanma = Math.sin(dalga.zaman * 2) * 9;
+    const dalgalanma = Math.sin(dalga.zaman * 2) * 5;
 
                          
 
@@ -234,6 +234,7 @@ ctx.restore();
 
   dongu();
 }
+
 
 
 
