@@ -114,11 +114,11 @@ async function baslatOyun() {
     ctx.drawImage(resimler.kule, 0, 0, canvas.width, canvas.height);
 
     // DALGA
-    dalga.zaman += 0.04;    //0.02 ydi
-    const dalgalanma = Math.sin(dalga.zaman * 2) * 8;
+    dalga.zaman += 0.02;    //0.02 ydi
+    const dalgalanma = Math.sin(dalga.zaman * 0.5) * 6
 
-                      + Math.sin(dalga.zaman * 3.5) * 3  // daha doğal, üst üste dalgalar
-                      + Math.sin(dalga.zaman * 0.7) * 2;    
+                      + Math.sin(dalga.zaman * 2.3) * 2  
+                      + Math.sin(dalga.zaman * 0.7) * 1.5;    
 
     const denizBaslangicY = canvas.height * 0.04;
     const dalgaYukseklik = canvas.height * 0.99;
@@ -235,6 +235,7 @@ ctx.restore();
 
   dongu();
 }
+
 
 
 
