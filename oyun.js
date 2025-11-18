@@ -77,8 +77,8 @@ async function baslatOyun() {
   gemi = {
     x: canvas.width * 0.1,
     y: canvas.height * 0.45,
-    genislik: canvas.width * 0.47,
-    yükseklik: canvas.width * 0.43,
+    genislik: canvas.width * 0.52,
+    yükseklik: canvas.width * 0.48,
     hiz: 18
   };
 
@@ -232,6 +232,7 @@ ctx.restore();
 
   dongu();
 }
+
 
 
 
