@@ -82,7 +82,10 @@ async function baslatOyun() {
     hiz: 18
   };
 
-  dalga = { zaman: 0 };
+  dalga = { zaman: 0,
+  zaman2: 0,        // ikinci dalga katmanı için
+  zaman3: 0         // köpük senkronu için 
+    };
 
   // Köpük baloncukları
   kopukler = [];
@@ -111,17 +114,22 @@ async function baslatOyun() {
   function dongu() {
 
     // ARKA PLAN
-    ctx.drawImage(resimler.kule, 0, 0, canvas.width, canvas.height);
+    ctx.drawImage(resimler.kule, yatayDalga * 0.3, toplamDalga * 0.08, canvas.width, canvas.height);
 
     // DALGA
-    dalga.zaman += 0.025;    
-    const dalgalanma = Math.sin(dalga.zaman * 2) * 6;
+    dalga.zaman += 0.018;
+    dalga.zaman2 += 0.012;
+    dalga.zaman3 += 0.025;    
+    const dalga1 = Math.sin(dalga.zaman * 1.8) * 28;        // ana dalga
+    const dalga2 = Math.sin(dalga.zaman2 * 2.4 + 1) * 18;   // ikincil dalga (katman)
+    const dalga3 = Math.sin(dalga.zaman3 * 3.1 + 2) * 10;   // hızlı titreşim
+    const toplamDalga = dalga1 + dalga2 + dalga3;
+
+    const yatayDalga = Math.sin(dalga.zaman * 1.3) * 12;   // hafif yana kayma
 
                          
-
-    const denizBaslangicY = canvas.height * 0.04;
-    const dalgaYukseklik = canvas.height * 0.99;
-
+// YENİ: sabit değer yerine dinamik dalga seviyesi
+const denizY = canvas.height * 0.04 + toplamDalga * 0.9;  // <-- tek satır, her şey buna göre çalışacak
 
 
 
@@ -130,55 +138,52 @@ async function baslatOyun() {
     
 
     ctx.save();
-    ctx.translate(0, denizBaslangicY + dalgalanma);
+    ctx.translate(yatayDalga, canvas.height * 0.04 + toplamDalga * 0.9);
 
     const kaynakY = resimler.dalga.height * 0.05;
     const kaynakYukseklik = resimler.dalga.height * 0.95;
 
     ctx.drawImage(
       resimler.dalga,
-      0, kaynakY,
-      resimler.dalga.width,
-      kaynakYukseklik,
-      0, 0,
-      canvas.width,
-      dalgaYukseklik
+    0, resimler.dalga.height * 0.05,
+    resimler.dalga.width, resimler.dalga.height * 0.95,
+    0, 0,
+    canvas.width + yatayDalga * 2, canvas.height * 1.1
     );
 
     ctx.restore();
 
     // Köpük baloncukları
     kopukler.forEach(k => {
-      k.x += k.hizX;
-      k.y += k.hizY + Math.sin(dalga.zaman + k.x * 0.01) * 0.3;
+    k.x += k.hizX + Math.cos(dalga.zaman3 + k.x * 0.02) * 1.2;
+    k.y += k.hizY + toplamDalga * 0.18;
 
-      if (k.x < 0) k.x = canvas.width;
-      if (k.x > canvas.width) k.x = 0;
-      if (k.y < denizBaslangicY) k.y = denizBaslangicY + 20 + Math.random() * 100;
-      if (k.y > canvas.height) k.y = denizBaslangicY + Math.random() * 100;
+    // Köpükler dalganın üstünde kalsın
+    const minY = canvas.height * 0.04 + toplamDalga + 20;
+    if (k.y < minY) k.y = minY + Math.random() * 80;
 
-      ctx.beginPath();
-      ctx.arc(k.x, k.y, k.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(255,255,255,${k.saydam})`;
-      ctx.fill();
+    // Parıltı efekti (dalga yükseldikçe köpük parlasın)
+    const parlaklik = 0.3 + Math.abs(toplamDalga) * 0.02;
+    ctx.beginPath();
+    ctx.arc(k.x, k.y, k.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255,255,255,${k.saydam + parlaklik})`;
+    ctx.fill();
     });
 
     // KÖPÜK ÜST ÇİZGİ — düzelttim
-    const köpükY = denizBaslangicY + dalgalanma;
-    const köpükYukseklik = 30;
-
-    const gradient = ctx.createLinearGradient(0, köpükY, 0, köpükY + köpükYukseklik);
-    gradient.addColorStop(0, "rgba(255,255,255,0.6)");
-    gradient.addColorStop(1, "rgba(255,255,255,0)");
-
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, köpükY, canvas.width, köpükYukseklik);
+    const köpükY = canvas.height * 0.04 + toplamDalga;
+  const gradient = ctx.createLinearGradient(0, köpükY, 0, köpükY + 50);
+  gradient.addColorStop(0, "rgba(255,255,255,0.8)");
+  gradient.addColorStop(0.4, "rgba(255,255,255,0.4)");
+  gradient.addColorStop(1, "rgba(255,255,255,0)");
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, köpükY, canvas.width, 50);
 
     // MARTILAR
     martilar.forEach(m => {
-      m.zaman += 0.05;
-      m.y = m.baseY + Math.sin(m.zaman) * (canvas.height * 0.05);
-
+    m.zaman += 0.05;
+    m.y = m.baseY + Math.sin(m.zaman) * (canvas.height * 0.05) + toplamDalga * 0.25;
+      
       if (m.yon === "sol") {
         m.x -= m.hiz;
         if (m.x < -300) m.x = canvas.width + 100;
@@ -211,9 +216,14 @@ gemi.y = Math.max(ustSinir, Math.min(canvas.height - gemi.yükseklik, gemi.y));
 
     }
 
+    else {
+    // Dokunulmadığında hafif dalga ile sallansın
+    gemi.y = canvas.height * 0.45 + Math.sin(dalga.zaman * 2) * 8;
+  }
+
     // GEMİ GÖLGESİ (suya yakın)
 const gölgeX = gemi.x + gemi.genislik * 0.1;
-const gölgeY = gemi.y + gemi.yükseklik - 10; // biraz yukarıdan başlat
+const gölgeY = gemi.y + gemi.yükseklik - 10 + toplamDalga * 0.3;
 const gölgeGenislik = gemi.genislik * 0.8;
 const gölgeYukseklik = 20;
 
@@ -241,6 +251,7 @@ ctx.restore();
 
   dongu();
 }
+
 
 
 
