@@ -112,7 +112,7 @@ ctx.drawImage(resimler.kule, 0, 0, canvas.width, canvas.height);
 
     // DALGA – TEK RESİM, TEMİZ, BOŞLUK YOK!
     ctx.save();
-    ctx.translate(yatayDalga * 0.7, denizY - canvas.height * 0.06);
+    ctx.translate(yatayDalga * 0.7, denizY - canvas.height * 0.01);
     ctx.drawImage(
       resimler.dalga,
       0, resimler.dalga.height * 0.05,
@@ -189,6 +189,7 @@ ctx.drawImage(resimler.kule, 0, 0, canvas.width, canvas.height);
   }
   dongu();
 }
+
 
 
 
