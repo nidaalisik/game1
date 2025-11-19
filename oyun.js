@@ -70,18 +70,20 @@ async function baslatOyun() {
   canvas.addEventListener("click", muzikBaslat);
 
   gemi = { x: canvas.width * 0.1, y: canvas.height * 0.45, genislik: canvas.width * 0.52, yükseklik: canvas.width * 0.48, hiz: 18 };
-  dalga = { zaman: 0, zaman2: 0, zaman3: 0 };
+  
+  // Daha yumuşak ve yavaş dalga
+  dalga = { zaman: 0 };
 
-  // Köpükler
+  // Köpükler artık çok daha yavaş ve şeffaf
   kopukler = [];
-  for (let i = 0; i < 40; i++) {
+  for (let i = 0; i < 35; i++) {
     kopukler.push({
       x: Math.random() * canvas.width,
       y: canvas.height * 0.4 + Math.random() * (canvas.height * 0.3),
-      r: Math.random() * 12 + 3,
-      hizX: (Math.random() - 0.5) * 0.5,
-      hizY: (Math.random() - 0.5) * 0.3,
-      saydam: Math.random() * 0.5 + 0.2
+      r: Math.random() * 10 + 4,
+      hizX: (Math.random() - 0.5) * 0.2,   // çok yavaşladık
+      hizY: (Math.random() - 0.5) * 0.15,  // çok yavaşladık
+      saydam: Math.random() * 0.3 + 0.1    // daha şeffaf
     });
   }
 
@@ -97,80 +99,61 @@ async function baslatOyun() {
   canvas.addEventListener("touchend", () => touch = null);
 
   function dongu() {
-    // 3 katmanlı gerçekçi dalga
-    dalga.zaman += 0.018;
-    dalga.zaman2 += 0.012;
-    dalga.zaman3 += 0.025;
+    dalga.zaman += 0.015; // daha yavaş
 
-    const dalga1 = Math.sin(dalga.zaman * 1.8) * 28;
-    const dalga2 = Math.sin(dalga.zaman2 * 2.4 + 1) * 18;
-    const dalga3 = Math.sin(dalga.zaman3 * 3.1 + 2) * 10;
-    const toplamDalga = dalga1 + dalga2 + dalga3;
-    const yatayDalga = Math.sin(dalga.zaman * 1.3) * 12;
+    // Dalga salınımı çok azaltıldı
+    const toplamDalga = Math.sin(dalga.zaman * 1.5) * 16;     // eskisi 60+ idi, şimdi 16!
+    const yatayDalga = Math.sin(dalga.zaman * 1.2) * 6;      // eskisi 12 idi, şimdi 6!
 
-    const denizY = canvas.height * 0.04 + toplamDalga * 0.9;
+    const denizY = canvas.height * 0.04 + toplamDalga * 0.8;
 
-    // 1. Arka plan (hafif dalgalı)
-    ctx.drawImage(resimler.kule, yatayDalga * 0.3, toplamDalga * 0.08, canvas.width, canvas.height);
+    // Arka plan (çok az sallanıyor)
+    ctx.drawImage(resimler.kule, yatayDalga * 0.4, toplamDalga * 0.06, canvas.width, canvas.height);
 
-    // 2. DALGA – EKRANDAN ASLA ÇIKMAZ!
+    // DALGA – TEK RESİM, TEMİZ, BOŞLUK YOK!
     ctx.save();
-    ctx.translate(yatayDalga * 0.8, denizY);
-    const ekstraGenislik = canvas.width + Math.abs(yatayDalga) * 4;
-
-    // İlk dalga
+    ctx.translate(yatayDalga * 0.7, denizY);
     ctx.drawImage(
       resimler.dalga,
       0, resimler.dalga.height * 0.05,
       resimler.dalga.width, resimler.dalga.height * 0.95,
-      -ekstraGenislik / 2, 0,
-      ekstraGenislik, canvas.height * 1.2
-    );
-    // İkinci dalga (kesinlikle boşluk kalmasın diye)
-    ctx.drawImage(
-      resimler.dalga,
-      0, resimler.dalga.height * 0.05,
-      resimler.dalga.width, resimler.dalga.height * 0.95,
-      -ekstraGenislik / 2 + ekstraGenislik, 0,
-      ekstraGenislik, canvas.height * 1.2
+      -canvas.width * 0.1, -20,
+      canvas.width * 1.2, canvas.height * 1.2
     );
     ctx.restore();
 
-    // 3. Köpük baloncukları
+    // Köpükler – çok yavaş ve şeffaf
     kopukler.forEach(k => {
-      k.x += k.hizX + Math.cos(dalga.zaman3 + k.x * 0.02) * 1.2;
-      k.y += k.hizY + toplamDalga * 0.18;
+      k.x += k.hizX;
+      k.y += k.hizY + toplamDalga * 0.05;
       if (k.x < 0) k.x = canvas.width;
       if (k.x > canvas.width) k.x = 0;
-      const minY = denizY + 20;
-      if (k.y < minY) k.y = minY + Math.random() * 80;
-      if (k.y > canvas.height) k.y = minY + Math.random() * 100;
+      if (k.y < denizY + 20) k.y = denizY + 20 + Math.random() * 60;
+      if (k.y > canvas.height) k.y = denizY + Math.random() * 100;
 
-      const parlaklik = 0.3 + Math.abs(toplamDalga) * 0.02;
       ctx.beginPath();
       ctx.arc(k.x, k.y, k.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(255,255,255,${k.saydam + parlaklik})`;
+      ctx.fillStyle = `rgba(255,255,255,${k.saydam})`;
       ctx.fill();
     });
 
-    // 4. Köpük üst çizgisi (her zaman görünür)
-    const gradient = ctx.createLinearGradient(0, denizY - 20, 0, denizY + 60);
-    gradient.addColorStop(0, "rgba(255,255,255,0.9)");
-    gradient.addColorStop(0.5, "rgba(255,255,255,0.5)");
+    // Köpük çizgisi – sade ve güzel
+    const gradient = ctx.createLinearGradient(0, denizY - 15, 0, denizY + 40);
+    gradient.addColorStop(0, "rgba(255,255,255,0.7)");
     gradient.addColorStop(1, "rgba(255,255,255,0)");
     ctx.fillStyle = gradient;
-    ctx.fillRect(0, denizY - 20, canvas.width, 80);
+    ctx.fillRect(0, denizY - 15, canvas.width, 55);
 
-    // 5. Martılar
+    // Martılar
     martilar.forEach(m => {
       m.zaman += 0.05;
-      m.y = m.baseY + Math.sin(m.zaman) * (canvas.height * 0.05) + toplamDalga * 0.25;
+      m.y = m.baseY + Math.sin(m.zaman) * (canvas.height * 0.05) + toplamDalga * 0.2;
       if (m.yon === "sol") { m.x -= m.hiz; if (m.x < -300) m.x = canvas.width + 100; }
       else { m.x += m.hiz; if (m.x > canvas.width + 300) m.x = -200; }
       ctx.drawImage(m.resim, m.x, m.y, canvas.width * 0.12, canvas.width * 0.09);
     });
 
-    // 6. Gemi hareketi
+    // Gemi hareketi
     if (touch) {
       const rect = canvas.getBoundingClientRect();
       const scaleX = canvas.width / rect.width;
@@ -187,20 +170,19 @@ async function baslatOyun() {
       gemi.x = Math.max(0, Math.min(canvas.width - gemi.genislik, gemi.x));
       gemi.y = Math.max(ustSinir, Math.min(canvas.height - gemi.yükseklik, gemi.y));
     } else {
-      gemi.y = canvas.height * 0.45 + Math.sin(dalga.zaman * 2) * 10;
+      gemi.y = canvas.height * 0.45 + Math.sin(dalga.zaman * 2) * 6;
     }
 
-    // 7. Gemi gölgesi
-    const gölgeY = gemi.y + gemi.yükseklik - 10 + toplamDalga * 0.3;
+    // Gemi gölgesi
     ctx.save();
     ctx.globalAlpha = 0.25;
     ctx.fillStyle = "black";
     ctx.beginPath();
-    ctx.ellipse(gemi.x + gemi.genislik * 0.5, gölgeY + 10, gemi.genislik * 0.4, 10, 0, 0, Math.PI * 2);
+    ctx.ellipse(gemi.x + gemi.genislik * 0.5, gemi.y + gemi.yükseklik + 5 + toplamDalga * 0.2, gemi.genislik * 0.4, 12, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
 
-    // 8. Gemi
+    // Gemi
     ctx.drawImage(resimler.gemi, gemi.x, gemi.y, gemi.genislik, gemi.yükseklik);
 
     requestAnimationFrame(dongu);
