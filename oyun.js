@@ -83,7 +83,7 @@ async function baslatOyun() {
       r: Math.random() * 10 + 4,
       hizX: (Math.random() - 0.5) * 0.2,   // çok yavaşladık
       hizY: (Math.random() - 0.5) * 0.15,  // çok yavaşladık
-      saydam: Math.random() * 0.3 + 0.1    // daha şeffaf
+      saydam: Math.random() * 0.4 + 0.35    // daha şeffaf
     });
   }
 
@@ -117,7 +117,7 @@ async function baslatOyun() {
       resimler.dalga,
       0, resimler.dalga.height * 0.05,
       resimler.dalga.width, resimler.dalga.height * 0.95,
-      -canvas.width * 0.1, -20,
+      -canvas.width * 0.1, -28,
       canvas.width * 1.2, canvas.height * 1.2
     );
     ctx.restore();
@@ -189,3 +189,4 @@ async function baslatOyun() {
   }
   dongu();
 }
+
