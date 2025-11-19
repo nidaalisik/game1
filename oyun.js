@@ -31,9 +31,7 @@ if (gemiAdi) {
     document.getElementById("yuklemeEkran").style.display = "none";
     baslatOyun();
   };
-  img.onerror = () => {
-    durumDiv.innerText = "GEMİ BULUNAMADI!";
-  };
+  img.onerror = () => { durumDiv.innerText = "GEMİ BULUNAMADI!"; };
   img.src = `gemiler/${gemiAdi}.png`;
 } else {
   durumDiv.innerText = "QR KOD YOK!";
@@ -71,18 +69,10 @@ async function baslatOyun() {
   canvas.addEventListener("touchstart", muzikBaslat);
   canvas.addEventListener("click", muzikBaslat);
 
-  gemi = {
-    x: canvas.width * 0.1,
-    y: canvas.height * 0.45,
-    genislik: canvas.width * 0.52,
-    yükseklik: canvas.width * 0.48,
-    hiz: 18
-  };
-
-  // 3 katmanlı gerçekçi dalga sistemi
+  gemi = { x: canvas.width * 0.1, y: canvas.height * 0.45, genislik: canvas.width * 0.52, yükseklik: canvas.width * 0.48, hiz: 18 };
   dalga = { zaman: 0, zaman2: 0, zaman3: 0 };
 
-  // Köpük baloncukları
+  // Köpükler
   kopukler = [];
   for (let i = 0; i < 40; i++) {
     kopukler.push({
@@ -120,28 +110,38 @@ async function baslatOyun() {
 
     const denizY = canvas.height * 0.04 + toplamDalga * 0.9;
 
-    // ARKA PLAN (hafif dalgalı)
+    // 1. Arka plan (hafif dalgalı)
     ctx.drawImage(resimler.kule, yatayDalga * 0.3, toplamDalga * 0.08, canvas.width, canvas.height);
 
-    // ANA DALGA (çok gerçekçi!)
+    // 2. DALGA – EKRANDAN ASLA ÇIKMAZ!
     ctx.save();
-    ctx.translate(yatayDalga, denizY);
+    ctx.translate(yatayDalga * 0.8, denizY);
+    const ekstraGenislik = canvas.width + Math.abs(yatayDalga) * 4;
+
+    // İlk dalga
     ctx.drawImage(
       resimler.dalga,
       0, resimler.dalga.height * 0.05,
       resimler.dalga.width, resimler.dalga.height * 0.95,
-      0, 0,
-      canvas.width + yatayDalga * 2, canvas.height * 1.1
+      -ekstraGenislik / 2, 0,
+      ekstraGenislik, canvas.height * 1.2
+    );
+    // İkinci dalga (kesinlikle boşluk kalmasın diye)
+    ctx.drawImage(
+      resimler.dalga,
+      0, resimler.dalga.height * 0.05,
+      resimler.dalga.width, resimler.dalga.height * 0.95,
+      -ekstraGenislik / 2 + ekstraGenislik, 0,
+      ekstraGenislik, canvas.height * 1.2
     );
     ctx.restore();
 
-    // KÖPÜK BALONLARI (dalga ile tam senkron)
+    // 3. Köpük baloncukları
     kopukler.forEach(k => {
       k.x += k.hizX + Math.cos(dalga.zaman3 + k.x * 0.02) * 1.2;
       k.y += k.hizY + toplamDalga * 0.18;
       if (k.x < 0) k.x = canvas.width;
       if (k.x > canvas.width) k.x = 0;
-
       const minY = denizY + 20;
       if (k.y < minY) k.y = minY + Math.random() * 80;
       if (k.y > canvas.height) k.y = minY + Math.random() * 100;
@@ -153,29 +153,24 @@ async function baslatOyun() {
       ctx.fill();
     });
 
-    // KÖPÜK ÜST ÇİZGİSİ (canlı!)
-    const gradient = ctx.createLinearGradient(0, denizY, 0, denizY + 50);
-    gradient.addColorStop(0, "rgba(255,255,255,0.8)");
-    gradient.addColorStop(0.4, "rgba(255,255,255,0.4)");
+    // 4. Köpük üst çizgisi (her zaman görünür)
+    const gradient = ctx.createLinearGradient(0, denizY - 20, 0, denizY + 60);
+    gradient.addColorStop(0, "rgba(255,255,255,0.9)");
+    gradient.addColorStop(0.5, "rgba(255,255,255,0.5)");
     gradient.addColorStop(1, "rgba(255,255,255,0)");
     ctx.fillStyle = gradient;
-    ctx.fillRect(0, denizY, canvas.width, 50);
+    ctx.fillRect(0, denizY - 20, canvas.width, 80);
 
-    // MARTILAR (dalga ile sallanıyor)
+    // 5. Martılar
     martilar.forEach(m => {
       m.zaman += 0.05;
       m.y = m.baseY + Math.sin(m.zaman) * (canvas.height * 0.05) + toplamDalga * 0.25;
-      if (m.yon === "sol") {
-        m.x -= m.hiz;
-        if (m.x < -300) m.x = canvas.width + 100;
-      } else {
-        m.x += m.hiz;
-        if (m.x > canvas.width + 300) m.x = -200;
-      }
+      if (m.yon === "sol") { m.x -= m.hiz; if (m.x < -300) m.x = canvas.width + 100; }
+      else { m.x += m.hiz; if (m.x > canvas.width + 300) m.x = -200; }
       ctx.drawImage(m.resim, m.x, m.y, canvas.width * 0.12, canvas.width * 0.09);
     });
 
-    // GEMİ HAREKETİ
+    // 6. Gemi hareketi
     if (touch) {
       const rect = canvas.getBoundingClientRect();
       const scaleX = canvas.width / rect.width;
@@ -192,22 +187,20 @@ async function baslatOyun() {
       gemi.x = Math.max(0, Math.min(canvas.width - gemi.genislik, gemi.x));
       gemi.y = Math.max(ustSinir, Math.min(canvas.height - gemi.yükseklik, gemi.y));
     } else {
-      // Dokunulmadığında dalga ile hafif sallansın
       gemi.y = canvas.height * 0.45 + Math.sin(dalga.zaman * 2) * 10;
     }
 
-    // GEMİ GÖLGESİ (dalgaya göre değişiyor)
-    const gölgeX = gemi.x + gemi.genislik * 0.1;
+    // 7. Gemi gölgesi
     const gölgeY = gemi.y + gemi.yükseklik - 10 + toplamDalga * 0.3;
     ctx.save();
     ctx.globalAlpha = 0.25;
     ctx.fillStyle = "black";
     ctx.beginPath();
-    ctx.ellipse(gölgeX + gemi.genislik * 0.4, gölgeY + 10, gemi.genislik * 0.4, 10, 0, 0, Math.PI * 2);
+    ctx.ellipse(gemi.x + gemi.genislik * 0.5, gölgeY + 10, gemi.genislik * 0.4, 10, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
 
-    // GEMİ
+    // 8. Gemi
     ctx.drawImage(resimler.gemi, gemi.x, gemi.y, gemi.genislik, gemi.yükseklik);
 
     requestAnimationFrame(dongu);
