@@ -107,8 +107,8 @@ async function baslatOyun() {
 
     const denizY = canvas.height * 0.04 + toplamDalga * 0.8;
 
-    // Arka plan (çok az sallanıyor)
-    ctx.drawImage(resimler.kule, yatayDalga * 0.4, toplamDalga * 0.06, canvas.width, canvas.height);
+   // KIZ KULESİ %100 SABİT!
+ctx.drawImage(resimler.kule, 0, 0, canvas.width, canvas.height);
 
     // DALGA – TEK RESİM, TEMİZ, BOŞLUK YOK!
     ctx.save();
@@ -189,5 +189,6 @@ async function baslatOyun() {
   }
   dongu();
 }
+
 
 
