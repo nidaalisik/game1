@@ -99,7 +99,7 @@ async function baslatOyun() {
   canvas.addEventListener("touchend", () => touch = null);
 
   function dongu() {
-    dalga.zaman += 0.015; // daha yavaş
+    dalga.zaman += 0.019; // daha yavaş
 
     // Dalga salınımı çok azaltıldı
     const toplamDalga = Math.sin(dalga.zaman * 1.5) * 16;     // eskisi 60+ idi, şimdi 16!
@@ -117,7 +117,7 @@ async function baslatOyun() {
       resimler.dalga,
       0, resimler.dalga.height * 0.05,
       resimler.dalga.width, resimler.dalga.height * 0.95,
-      -canvas.width * 0.1, -28,
+      -canvas.width * 0.1, -35,
       canvas.width * 1.2, canvas.height * 1.2
     );
     ctx.restore();
@@ -189,4 +189,5 @@ async function baslatOyun() {
   }
   dongu();
 }
+
 
