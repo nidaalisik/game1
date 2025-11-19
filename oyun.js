@@ -4,10 +4,20 @@ const ctx = canvas.getContext("2d");
 function resizeCanvas() {
   const width = window.innerWidth;
   const height = window.innerHeight;
-  canvas.width = width * 2;
-  canvas.height = height * 2;
+
+  // Mobil → 2×, tablet → 2.5×, laptop/masaüstü → 3× (netlik artıyor)
+  let scale = 2;
+  if (width > 768) scale = 2.5;
+  if (width > 1200) scale = 3;   // ← işte bu satır laptopta kaliteyi uçuruyor
+
+  canvas.width = width * scale;
+  canvas.height = height * scale;
   canvas.style.width = width + "px";
   canvas.style.height = height + "px";
+
+  // Bu satır çok önemli, tüm çizimleri ölçekliyor
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.scale(scale, scale);
 }
 window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
@@ -189,6 +199,7 @@ ctx.drawImage(resimler.kule, 0, 0, canvas.width, canvas.height);
   }
   dongu();
 }
+
 
 
 
