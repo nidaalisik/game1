@@ -170,7 +170,7 @@ ctx.drawImage(resimler.kule, 0, 0, canvas.width, canvas.height);
       gemi.x = Math.max(0, Math.min(canvas.width - gemi.genislik, gemi.x));
       gemi.y = Math.max(ustSinir, Math.min(canvas.height - gemi.yükseklik, gemi.y));
     } else {
-      gemi.y = canvas.height * 0.45 + Math.sin(dalga.zaman * 2) * 6;
+      gemi.y += Math.sin(dalga.zaman * 2) * 0.8;
     }
 
     // Gemi gölgesi
@@ -189,6 +189,7 @@ ctx.drawImage(resimler.kule, 0, 0, canvas.width, canvas.height);
   }
   dongu();
 }
+
 
 
 
