@@ -1,195 +1,208 @@
-// oyun.js – LAPTOP SON HAL (20 Kasım 2025) – MOBİL DENİZ HAREKETİ EKLENDİ
 const canvas = document.getElementById("oyunAlani");
 const ctx = canvas.getContext("2d");
-canvas.width = 1300;
-canvas.height = 760;
 
-let gemi, martilar = [], dalga;
-let baloncuklar = [];
+function resizeCanvas() {
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+  canvas.width = width * 2;
+  canvas.height = height * 2;
+  canvas.style.width = width + "px";
+  canvas.style.height = height + "px";
+}
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
+
+document.getElementById("aikaLogo").style.display = "none";
+document.getElementById("imza").style.display = "none";
+
+let gemi, martilar = [], dalga, kopukler = [];
 const resimler = {};
 let arkaPlanMuzik;
 
-// === GEMİ YÜKLEME ===
-document.getElementById("dosyaSec").addEventListener("change", function(e) {
-  const dosya = e.target.files[0];
-  if (!dosya) return;
+const urlParams = new URLSearchParams(window.location.search);
+const gemiAdi = urlParams.get('gemi')?.toLowerCase();
+const durumDiv = document.getElementById("durum);
+
+if (gemiAdi) {
+  durumDiv.innerText = `${gemiAdi.toUpperCase()}'İN GEMİSİ YÜKLENİYOR...`;
   const img = new Image();
-  img.onload = function() {
+  img.onload = () => {
     resimler.gemi = img;
     document.getElementById("yuklemeEkran").style.display = "none";
     baslatOyun();
   };
-  img.src = URL.createObjectURL(dosya);
-});
+  // GEMİ BULUNAMAZSA BİLE OYUN BAŞLASIN!
+  img.onerror = () => {
+    console.log("Gemi resmi yok ama oyun devam ediyor:", gemiAdi);
+    resimler.gemi = null; // gemi olmazsa bile diğer her şey çalışsın
+    document.getElementById("yuklemeEkran").style.display = "none";
+    baslatOyun();
+  };
+  img.src = `gemiler/${gemiAdi}.png`;
+} else {
+  durumDiv.innerText = "QR KOD BEKLENİYOR...";
+  // QR kod hiç okunmazsa bile 4 saniye sonra otomatik oyun başlasın (demo mod)
+  setTimeout(() => {
+    document.getElementById("yuklemeEkran").style.display = "none";
+    baslatOyun();
+  }, 4000);
+}
 
-// === RESİM VE SES YÜKLEME ===
 function yukleResim(adi, yol) {
   return new Promise((resolve) => {
     const img = new Image();
     img.onload = () => { resimler[adi] = img; resolve(); };
-    img.onerror = () => { console.error(`${adi} YÜKLENEMEDİ: ${yol}`); resolve(); };
+    img.onerror = () => { console.error(`${adi} yüklenemedi`); resolve(); };
     img.src = yol;
   });
 }
 
-// === YENİ GEMİ SINIFI (salınım + gölge) ===
-class Gemi {
-  constructor() {
-    this.x = 500;
-    this.y = 450;
-    this.baseY = 450;
-    this.hiz = 5;
-    this.zaman = Math.random() * 100;
-    this.genislik = 220;
-    this.yukseklik = 200;
-  }
-  hareketEt(tuslar) {
-    if (tuslar.ArrowLeft || tuslar.KeyA) this.x -= this.hiz;
-    if (tuslar.ArrowRight || tuslar.KeyD) this.x += this.hiz;
-    if (tuslar.ArrowUp || tuslar.KeyW) this.y -= this.hiz;
-    if (tuslar.ArrowDown || tuslar.KeyS) this.y += this.hiz;
-
-    this.x = Math.max(0, Math.min(canvas.width - this.genislik, this.x));
-    this.y = Math.max(370, Math.min(530, this.y));
-    this.baseY = this.y;
-  }
-  ciz() {
-    this.zaman += 0.025;   // çok yumuşak salınım
-
-    const salinimY = Math.sin(this.zaman * 2) * 7;
-    const salinimX = Math.sin(this.zaman * 1.4) * 10;
-    const renderX = this.x + salinimX;
-    const renderY = this.baseY + salinimY;
-
-    // gölge
-    ctx.save();
-    ctx.globalAlpha = 0.28;
-    ctx.fillStyle = "black";
-    ctx.beginPath();
-    ctx.ellipse(renderX + 110, renderY + this.yukseklik + 8 + salinimY * 0.3, 92, 15, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-
-    // gemi
-    ctx.drawImage(resimler.gemi, renderX, renderY, this.genislik, this.yukseklik);
-  }
-}
-
-// === DİĞER SINIFLAR (değişmedi) ===
-class Baloncuk {
-  constructor() {
-    this.x = Math.random() * canvas.width;
-    this.y = Math.random() * (canvas.height / 3) + 500;
-    this.r = Math.random() * 4 + 2;
-    this.hiz = Math.random() * 1 + 0.5;
-    this.alpha = Math.random() * 0.5 + 0.5;
-  }
-  hareketEt() { this.y -= this.hiz; this.alpha -= 0.002; }
-  ciz() {
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(255,255,255,${this.alpha})`;
-    ctx.fill();
-  }
-}
-
-class Marti {
-  constructor(x, y, resim, hiz, yon = "sol", tersCevir = true) {
-    this.x = x; this.y = y; this.resim = resim; this.hiz = hiz;
-    this.yon = yon; this.tersCevir = tersCevir;
-    this.zaman = Math.random() * 100;
-  }
-  hareketEt() {
-    this.zaman += 0.1;
-    this.y = this.y + Math.sin(this.zaman) * 4;
-    if (this.yon === "sol") { this.x -= this.hiz; if (this.x < -200) this.x = 1400; }
-    else { this.x += this.hiz; if (this.x > 1400) this.x = -200; }
-  }
-  ciz() {
-    ctx.save();
-    if (this.yon === "sag" && this.tersCevir) {
-      ctx.translate(this.x + 140, this.y);
-      ctx.scale(-1, 1);
-      ctx.drawImage(this.resim, 0, 0, 140, 100);
-    } else {
-      ctx.drawImage(this.resim, this.x, this.y, 140, 100);
-    }
-    ctx.restore();
-  }
-}
-
-class Dalga { constructor() { this.zaman = 0; } }  // sadece zaman tutuyoruz artık
-
-// === OYUN BAŞLAT ===
 async function baslatOyun() {
+  document.getElementById("aikaLogo").style.display = "block";
+  document.getElementById("imza").style.display = "block";
+
   await Promise.all([
-    yukleResim("kule", "kiz_kulesi.jpg"),
+    yukleResim("kule", "kiz_kulesi_uzun.jpg"),
     yukleResim("dalga", "dalga.png"),
     yukleResim("marti1", "marti1.png"),
     yukleResim("marti2", "marti2.png"),
-    yukleResim("marti3", "marti3.png"),
-    new Promise(resolve => {
-      const audio = new Audio("istanbul_sarkisi.mp3");
-      audio.oncanplaythrough = () => { arkaPlanMuzik = audio; resolve(); };
-      audio.onerror = () => resolve();
-    })
+    yukleResim("marti3", "marti3.png")
   ]);
 
-  gemi = new Gemi();
-  dalga = new Dalga();
+  arkaPlanMuzik = new Audio("istanbul_sarkisi.mp3");
+  arkaPlanMuzik.loop = true;
+  arkaPlanMuzik.volume = 0.6;
 
-  martilar = [
-    new Marti(1400, 50, resimler.marti1, 1.0, "sol", true),
-    new Marti(-100, 110, resimler.marti2, 1.5, "sag", false),
-    new Marti(1400, 200, resimler.marti3, 2.5, "sol", true)
-  ];
-
-  if (arkaPlanMuzik) {
-    arkaPlanMuzik.loop = true;
-    arkaPlanMuzik.volume = 0.6;
+  function muzikBaslat() {
     arkaPlanMuzik.play().catch(() => {});
+    canvas.removeEventListener("touchstart", muzikBaslat);
+    canvas.removeEventListener("click", muzikBaslat);
+  }
+  canvas.addEventListener("touchstart", muzikBaslat);
+  canvas.addEventListener("click", muzikBaslat);
+
+  gemi = { x: canvas.width * 0.1, y: canvas.height * 0.45, genislik: canvas.width * 0.52, yükseklik: canvas.width * 0.48, hiz: 18 };
+
+  dalga = { zaman: 0 };
+
+  kopukler = [];
+  for (let i = 0; i < 35; i++) {
+    kopukler.push({
+      x: Math.random() * canvas.width,
+      y: canvas.height * 0.4 + Math.random() * (canvas.height * 0.3),
+      r: Math.random() * 10 + 4,
+      hizX: (Math.random() - 0.5) * 0.2,
+      hizY: (Math.random() - 0.5) * 0.15,
+      saydam: Math.random() * 0.4 + 0.35
+    });
   }
 
-  const tuslar = {};
-  window.addEventListener("keydown", e => tuslar[e.key] = true);
-  window.addEventListener("keyup", e => tuslar[e.key] = false);
+  martilar = [
+    { x: canvas.width, baseY: canvas.height * 0.1, y: canvas.height * 0.1, resim: resimler.marti1, hiz: 1.5, yon: "sol", zaman: 0 },
+    { x: -200, baseY: canvas.height * 0.2, y: canvas.height * 0.2, resim: resimler.marti2, hiz: 2.0, yon: "sag", zaman: 1.5 },
+    { x: canvas.width, baseY: canvas.height * 0.3, y: canvas.height * 0.3, resim: resimler.marti3, hiz: 1.0, yon: "sol", zaman: 3 }
+  ];
 
-  // === YENİ DONUK – MOBİLDEKİ DENİZ HAREKETİ LAPTOPTA ===
+  let touch = null;
+  canvas.addEventListener("touchstart", e => { e.preventDefault(); touch = e.touches[0]; });
+  canvas.addEventListener("touchmove", e => { e.preventDefault(); touch = e.touches[0]; });
+  canvas.addEventListener("touchend", () => touch = null);
+
   function dongu() {
     dalga.zaman += 0.019;
 
     const toplamDalga = Math.sin(dalga.zaman * 1.5) * 16;
-    const yatayDalga  = Math.sin(dalga.zaman * 1.2) * 8;
-    const denizY = 97 + toplamDalga * 0.7;
+    const yatayDalga = Math.sin(dalga.zaman * 1.2) * 6;
+    const denizY = canvas.height * 0.04 + toplamDalga * 0.8;
 
-    // arka plan
-    ctx.drawImage(resimler.kule, 0, 0, 1300, 760);
+    ctx.drawImage(resimler.kule, 0, 0, canvas.width, canvas.height);
 
-    // dalga (mobildeki gibi kayıyor)
     ctx.save();
-    ctx.translate(yatayDalga, denizY - 10);
-    ctx.drawImage(resimler.dalga, -50, -40, 1400, 650);
+    ctx.translate(yatayDalga * 0.7, denizY - canvas.height * 0.01);
+    ctx.drawImage(
+      resimler.dalga,
+      0, resimler.dalga.height * 0.05,
+      resimler.dalga.width, resimler.dalga.height * 0.95,
+      -canvas.width * 0.1, -35,
+      canvas.width * 1.2, canvas.height * 1.2
+    );
     ctx.restore();
 
-    // köpük çizgisi (çok güzel duruyor)
-    const gradient = ctx.createLinearGradient(0, denizY + 440, 0, denizY + 500);
+    kopukler.forEach(k => {
+      k.x += k.hizX;
+      k.y += k.hizY + toplamDalga * 0.05;
+      if (k.x < 0) k.x = canvas.width;
+      if (k.x > canvas.width) k.x = 0;
+      if (k.y < denizY + 20) k.y = denizY + 20 + Math.random() * 60;
+      if (k.y > canvas.height) k.y = denizY + Math.random() * 100;
+
+      ctx.beginPath();
+      ctx.arc(k.x, k.y, k.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,${k.saydam})`;
+      ctx.fill();
+    });
+
+    const gradient = ctx.createLinearGradient(0, denizY - 15, 0, denizY + 40);
     gradient.addColorStop(0, "rgba(255,255,255,0.7)");
     gradient.addColorStop(1, "rgba(255,255,255,0)");
     ctx.fillStyle = gradient;
-    ctx.fillRect(0, denizY + 440, 1300, 60);
+    ctx.fillRect(0, denizY - 15, canvas.width, 55);
 
-    martilar.forEach(m => { m.hareketEt(); m.ciz(); });
-
-    gemi.hareketEt(tuslar);
-    gemi.ciz();
-
-    // baloncuklar
-    if (baloncuklar.length < 30 && Math.random() < 0.3) baloncuklar.push(new Baloncuk());
-    baloncuklar.forEach((b, i) => {
-      b.hareketEt();
-      b.ciz();
-      if (b.alpha <= 0) baloncuklar.splice(i, 1);
+    martilar.forEach(m => {
+      m.zaman += 0.05;
+      m.y = m.baseY + Math.sin(m.zaman) * (canvas.height * 0.05) + toplamDalga * 0.2;
+      if (m.yon === "sol") { m.x -= m.hiz; if (m.x < -300) m.x = canvas.width + 100; }
+      else { m.x += m.hiz; if (m.x > canvas.width + 300) m.x = -200; }
+      ctx.drawImage(m.resim, m.x, m.y, canvas.width * 0.12, canvas.width *  * 0.09);
     });
+
+    // Gemi hareketi
+    if (touch) {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      const targetX = (touch.clientX - rect.left) * scaleX;
+      const targetY = (touch.clientY - rect.top) * scaleY;
+
+      if (targetX < gemi.x + gemi.genislik / 2) gemi.x -= gemi.hiz;
+      if (targetX > gemi.x + gemi.genislik / 2) gemi.x += gemi.hiz;
+      if (targetY < gemi.y + gemi.yükseklik / 2) gemi.y -= gemi.hiz;
+      if (targetY > gemi.y + gemi.yükseklik / 2) gemi.y += gemi.hiz;
+
+      const ustSinir = canvas.height * 0.15;
+      gemi.x = Math.max(0, Math.min(canvas.width - gemi.genislik, gemi.x));
+      gemi.y = Math.max(ustSinir, Math.min(canvas.height - gemi.yükseklik, gemi.y));
+    } else {
+      gemi.y += Math.sin(dalga.zaman * 2) * 0.8;
+    }
+
+    // YENİ: SAĞA-SOLA + YUKARI-AŞAĞI DOĞAL SALINIM + GÖLGE
+    const gemiZaman = performance.now() * 0.001;
+    const salinimX = Math.sin(gemiZaman * 1.4) * 12;
+    const salinimY = Math.sin(gemiZaman * 2) * 6;
+
+    const renderX = gemi.x + salinimX;
+    const renderY = gemi.y + salinimY;
+
+    // Gölge
+    ctx.save();
+    ctx.globalAlpha = 0.28;
+    ctx.fillStyle = "black";
+    ctx.beginPath();
+    ctx.ellipse(
+      renderX + gemi.genislik * 0.5,
+      renderY + gemi.yükseklik + 8 + salinimY * 0.4,
+      gemi.genislik * 0.42,
+      14,
+      0, 0, Math.PI * 2
+    );
+    ctx.fill();
+    ctx.restore();
+
+    // Gemi (resim yoksa çizme, hata vermesin)
+    if (resimler.gemi) {
+      ctx.drawImage(resimler.gemi, renderX, renderY, gemi.genislik, gemi.yükseklik);
+    }
 
     requestAnimationFrame(dongu);
   }
