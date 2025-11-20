@@ -2,14 +2,12 @@ const canvas = document.getElementById("oyunAlani");
 const ctx = canvas.getContext("2d");
 
 function resizeCanvas() {
-  
   const width = window.innerWidth;
   const height = window.innerHeight;
   canvas.width = width * 2;
   canvas.height = height * 2;
   canvas.style.width = width + "px";
   canvas.style.height = height + "px";
-
 }
 window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
@@ -63,6 +61,7 @@ async function baslatOyun() {
   arkaPlanMuzik = new Audio("istanbul_sarkisi.mp3");
   arkaPlanMuzik.loop = true;
   arkaPlanMuzik.volume = 0.6;
+
   function muzikBaslat() {
     arkaPlanMuzik.play().catch(() => {});
     canvas.removeEventListener("touchstart", muzikBaslat);
@@ -72,20 +71,18 @@ async function baslatOyun() {
   canvas.addEventListener("click", muzikBaslat);
 
   gemi = { x: canvas.width * 0.1, y: canvas.height * 0.45, genislik: canvas.width * 0.52, yükseklik: canvas.width * 0.48, hiz: 18 };
-  
-  // Daha yumuşak ve yavaş dalga
+
   dalga = { zaman: 0 };
 
-  // Köpükler artık çok daha yavaş ve şeffaf
   kopukler = [];
   for (let i = 0; i < 35; i++) {
     kopukler.push({
       x: Math.random() * canvas.width,
       y: canvas.height * 0.4 + Math.random() * (canvas.height * 0.3),
       r: Math.random() * 10 + 4,
-      hizX: (Math.random() - 0.5) * 0.2,   // çok yavaşladık
-      hizY: (Math.random() - 0.5) * 0.15,  // çok yavaşladık
-      saydam: Math.random() * 0.4 + 0.35    // daha şeffaf
+      hizX: (Math.random() - 0.5) * 0.2,
+      hizY: (Math.random() - 0.5) * 0.15,
+      saydam: Math.random() * 0.4 + 0.35
     });
   }
 
@@ -101,18 +98,14 @@ async function baslatOyun() {
   canvas.addEventListener("touchend", () => touch = null);
 
   function dongu() {
-    dalga.zaman += 0.019; // daha yavaş
+    dalga.zaman += 0.019;
 
-    // Dalga salınımı çok azaltıldı
-    const toplamDalga = Math.sin(dalga.zaman * 1.5) * 16;     // eskisi 60+ idi, şimdi 16!
-    const yatayDalga = Math.sin(dalga.zaman * 1.2) * 6;      // eskisi 12 idi, şimdi 6!
-
+    const toplamDalga = Math.sin(dalga.zaman * 1.5) * 16;
+    const yatayDalga = Math.sin(dalga.zaman * 1.2) * 6;
     const denizY = canvas.height * 0.04 + toplamDalga * 0.8;
 
-   // KIZ KULESİ %100 SABİT!
-ctx.drawImage(resimler.kule, 0, 0, canvas.width, canvas.height);
+    ctx.drawImage(resimler.kule, 0, 0, canvas.width, canvas.height);
 
-    // DALGA – TEK RESİM, TEMİZ, BOŞLUK YOK!
     ctx.save();
     ctx.translate(yatayDalga * 0.7, denizY - canvas.height * 0.01);
     ctx.drawImage(
@@ -124,7 +117,6 @@ ctx.drawImage(resimler.kule, 0, 0, canvas.width, canvas.height);
     );
     ctx.restore();
 
-    // Köpükler – çok yavaş ve şeffaf
     kopukler.forEach(k => {
       k.x += k.hizX;
       k.y += k.hizY + toplamDalga * 0.05;
@@ -139,14 +131,12 @@ ctx.drawImage(resimler.kule, 0, 0, canvas.width, canvas.height);
       ctx.fill();
     });
 
-    // Köpük çizgisi – sade ve güzel
     const gradient = ctx.createLinearGradient(0, denizY - 15, 0, denizY + 40);
     gradient.addColorStop(0, "rgba(255,255,255,0.7)");
     gradient.addColorStop(1, "rgba(255,255,255,0)");
     ctx.fillStyle = gradient;
     ctx.fillRect(0, denizY - 15, canvas.width, 55);
 
-    // Martılar
     martilar.forEach(m => {
       m.zaman += 0.05;
       m.y = m.baseY + Math.sin(m.zaman) * (canvas.height * 0.05) + toplamDalga * 0.2;
@@ -155,7 +145,7 @@ ctx.drawImage(resimler.kule, 0, 0, canvas.width, canvas.height);
       ctx.drawImage(m.resim, m.x, m.y, canvas.width * 0.12, canvas.width * 0.09);
     });
 
-    // Gemi hareketi
+    // === GEMİ HAREKET ===
     if (touch) {
       const rect = canvas.getBoundingClientRect();
       const scaleX = canvas.width / rect.width;
@@ -175,27 +165,34 @@ ctx.drawImage(resimler.kule, 0, 0, canvas.width, canvas.height);
       gemi.y += Math.sin(dalga.zaman * 2) * 0.8;
     }
 
-    // Gemi gölgesi
+    // === YENİ: MASAÜSTÜYLE AYNI DOĞAL SALINIM + GERÇEKÇİ GÖLGE ===
+    const gemiZaman = performance.now() * 0.001;   // çok yumuşak zaman
+    const salinimX = Math.sin(gemiZaman * 1.4) * 12;   // sağ-sol yatma hissi
+    const salinimY = Math.sin(gemiZaman * 2) * 6;     // yukarı-aşağı dalga
+
+    const renderX = gemi.x + salinimX;
+    const renderY = gemi.y + salinimY;
+
+    // Gölge (salınımla birlikte hareket ediyor)
     ctx.save();
-    ctx.globalAlpha = 0.25;
+    ctx.globalAlpha = 0.28;
     ctx.fillStyle = "black";
     ctx.beginPath();
-    ctx.ellipse(gemi.x + gemi.genislik * 0.5, gemi.y + gemi.yükseklik + 5 + toplamDalga * 0.2, gemi.genislik * 0.4, 12, 0, 0, Math.PI * 2);
+    ctx.ellipse(
+      renderX + gemi.genislik * 0.5,
+      renderY + gemi.yükseklik + 8 + salinimY * 0.4,
+      gemi.genislik * 0.42,
+      14,
+      0, 0, Math.PI * 2
+    );
     ctx.fill();
     ctx.restore();
 
-    // Gemi
-    ctx.drawImage(resimler.gemi, gemi.x, gemi.y, gemi.genislik, gemi.yükseklik);
+    // Gemi kendisi
+    ctx.drawImage(resimler.gemi, renderX, renderY, gemi.genislik, gemi.yükseklik);
 
     requestAnimationFrame(dongu);
   }
+
   dongu();
 }
-
-
-
-
-
-
-
-
